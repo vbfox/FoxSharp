@@ -35,6 +35,14 @@ module MsvcrCommandLine =
         escape builder 0
         if needQuote then builder.Append('"') |> ignore
 
+    let escape cmdLine =
+        let builder = StringBuilder()
+        cmdLine |> Seq.iteri (fun i arg ->
+            if (i <> 0) then builder.Append(' ') |> ignore
+            escapeArg false arg builder)
+
+        builder.ToString()
+
 type CmdLineArgType = | Normal of string | Raw of string
 
 type CmdLine = {
