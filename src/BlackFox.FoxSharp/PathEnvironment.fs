@@ -33,7 +33,7 @@ let path =
     lazy (getPath())
 
 /// Extensions considered executables by the system.
-/// Parsed from PATHEXT on windows and always return [""] on other systems
+/// Parsed from `PATHEXT` on windows and always return `[""]` on other systems
 let pathExt =
     lazy (getPathExt())
 
