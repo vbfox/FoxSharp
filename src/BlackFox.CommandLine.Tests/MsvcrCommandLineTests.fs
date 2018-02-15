@@ -7,7 +7,7 @@ open Expecto.Flip
 
 let verifyEscape expected argv =
     let result = MsvcrCommandLine.escape argv
-    Expect.equal expected expected result
+    Expect.equal (sprintf "%A" argv) expected result
 
 let escapeTests = [
     test "Multiple_parameters_are_separated_by_spaces" {
@@ -63,8 +63,87 @@ let escapeTests = [
     }
 ]
 
+let verifyParse args expected =
+    let result = MsvcrCommandLine.parse args
+    Expect.equal args expected result
+
+let parseTests = [
+    test "Plain_parameter" {
+        verifyParse @"CallMeIshmael" ["CallMeIshmael"]
+    }
+
+    test "Space_in_double_quoted" {
+        verifyParse @"""Call Me Ishmael""" ["Call Me Ishmael"]
+    }
+
+    test "Double_quoted_anywhere" {
+        verifyParse @"Cal""l Me I""shmael" ["Call Me Ishmael"]
+    }
+
+    test "Escape_quotes" {
+        verifyParse @"CallMe\""Ishmael " [@"CallMe""Ishmael"]
+    }
+
+    test "Escape_backslash_end" {
+        verifyParse @"""Call Me Ishmael\\""" [@"Call Me Ishmael\"]
+    }
+
+    test "Escape_backslash_middle" {
+        verifyParse @"""CallMe\\\""Ishmael""" [@"CallMe\""Ishmael"]
+    }
+
+    test "Backslash_literal_without_quote" {
+        verifyParse @"a\\\b" [@"a\\\b"]
+    }
+
+    test "Backslash_literal_without_quote_in_quoted" {
+        verifyParse @"""a\\\b""" [@"a\\\b"]
+    }
+
+    test "Microsoft_sample_1" {
+        verifyParse @"""a b c""  d  e" ["a b c" ;"d" ;"e"]
+    }
+
+    test "Microsoft_sample_2" {
+        verifyParse @"""ab\""c""  ""\\""  d" ["ab\"c" ;"\\" ;"d"]
+    }
+
+    test "Microsoft_sample_3" {
+        verifyParse @"a\\\b d""e f""g h" ["a\\\\\\b" ;"de fg" ;"h"]
+    }
+
+    test "Microsoft_sample_4" {
+        verifyParse @"a\\\""b c d" [@"a\""b" ;"c" ;"d"]
+    }
+
+    test "Microsoft_sample_5" {
+        verifyParse @"a\\\\""b c"" d e" [@"a\\b c" ;"d" ;"e"]
+    }
+
+    test "Double_double_quotes_sample_1" {
+        verifyParse @"""a b c""""" [@"a b c"""]
+    }
+
+    test "Double_double_quotes_sample_2" {
+        verifyParse @"""""""CallMeIshmael""""""  b  c " [@"""CallMeIshmael""" ;"b" ;"c"]
+    }
+
+    test "Double_double_quotes_sample_4" {
+        verifyParse @"""""""""Call Me Ishmael"""" b c " [@"""Call" ;"Me" ;@"Ishmael" ;"b" ;"c"]
+    }
+
+    test "Triple_double_quotes" {
+        verifyParse @"""""""Call Me Ishmael""""""" [@"""Call Me Ishmael"""]
+    }
+
+    test "Quadruple_double_quotes" {
+        verifyParse @"""""""""Call me Ishmael""""""""" [@"""Call" ;"me" ;@"Ishmael"""]
+    }
+]
+
 [<Tests>]
 let test =
     testList "msvcr" [
         testList "escape" escapeTests
+        testList "parse" parseTests
     ]
