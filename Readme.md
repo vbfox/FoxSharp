@@ -25,6 +25,8 @@ shell.
 Example:
 
 ```fsharp
+open BlackFox.PathEnvironment
+
 match find "node" with
 | None -> failwith "nodejs wasn't found"
 | nodePath -> // ...
@@ -70,6 +72,8 @@ A replacement for FAKE `Target` using a syntax similar to Gulp
 Examples:
 
 ```fsharp
+open BlackFox.TaskDefinitionHelper
+
 // A task with no dependencies
 Task "Clean" [] (fun _ ->
     // ...
@@ -102,6 +106,8 @@ dependency definitions.
 Examples:
 
 ```fsharp
+open BlackFox.TypedTaskDefinitionHelper
+
 // A task with no dependencies
 let clean = Task "Clean" [] (fun _ ->
     // ...
