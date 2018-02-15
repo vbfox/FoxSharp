@@ -5,41 +5,70 @@ namespace BlackFox.CommandLine
 module MsvcrCommandLine =
     open System.Text
 
-    let escapeArg (doubleQuoteEscape: bool) (arg : string) (builder : StringBuilder) =
-        let needQuote = arg.Contains(" ") || arg.Contains("\t") || arg.Length = 0
-        let rec escape (builder: StringBuilder) pos =
+    let private addBackslashes (builder:StringBuilder) (backslashes: int) (beforeQuote: bool) =
+        if backslashes <> 0 then
+            // Always using 'backslashes * 2' would work it would just produce needless '\'
+            let count =
+                if beforeQuote || backslashes % 2 = 0 then
+                    backslashes * 2
+                else
+                    (backslashes-1) * 2 + 1
+
+            for _ in [0..count-1] do
+                builder.Append('\\') |> ignore
+
+    let private escapeArgCore (arg : string) (builder : StringBuilder) needQuote =
+        let rec escape pos backslashes =
             if pos >= arg.Length then
+                addBackslashes builder backslashes needQuote
                 ()
             else
                 let c = arg.[pos]
-                let isLast = pos = arg.Length-1
                 match c with
-                | '"' -> // Quotes are escaped
-                    if doubleQuoteEscape then
-                        escape (builder.Append(@"""""")) (pos + 1)
-                    else
-                        escape (builder.Append(@"\""")) (pos + 1)
-                | '\\' when isLast && needQuote -> // Backslash ending a quoted arg need escape
-                    escape (builder.Append(@"\\")) (pos + 1)
-                | '\\' when not isLast -> // Backslash followed by quote need to be escaped
-                    let nextC = arg.[pos+1]
-                    match nextC with
-                    | '"' ->
-                        escape (builder.Append(@"\\\""")) (pos + 2)
-                    | _ ->
-                        escape (builder.Append(c)) (pos + 1)
+                | '\\' ->
+                    escape (pos+1) (backslashes+1)
+                | '"' ->
+                    addBackslashes builder backslashes true
+                    builder.Append('\\') |> ignore
+                    builder.Append(c) |> ignore
+                    escape (pos+1) 0
                 | _ ->
-                    escape (builder.Append(c)) (pos + 1)
+                    addBackslashes builder backslashes false
+                    builder.Append(c) |> ignore
+                    escape (pos+1) 0
 
-        if needQuote then builder.Append('"') |> ignore
-        escape builder 0
-        if needQuote then builder.Append('"') |> ignore
+        escape 0 0
+
+    let escapeArg (arg : string) (builder : StringBuilder) =
+        builder.EnsureCapacity(arg.Length + builder.Length) |> ignore
+
+        if arg.Length = 0 then
+            // Empty arg
+            builder.Append(@"""""") |> ignore
+        else
+            let mutable needQuote = false
+            let mutable containsQuoteOrBackslash = false
+
+            for c in arg do
+                needQuote <- needQuote || (c = ' ')
+                needQuote <- needQuote || (c = '\t')
+                containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '"')
+                containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '\\')
+
+            if (not containsQuoteOrBackslash) && (not needQuote) then
+                // No special characters are present, early exit
+                builder.Append(arg) |> ignore
+            else
+                // Complex case, we really need to escape
+                if needQuote then builder.Append('"') |> ignore
+                escapeArgCore arg builder needQuote
+                if needQuote then builder.Append('"') |> ignore
 
     let escape cmdLine =
         let builder = StringBuilder()
         cmdLine |> Seq.iteri (fun i arg ->
             if (i <> 0) then builder.Append(' ') |> ignore
-            escapeArg false arg builder)
+            escapeArg arg builder)
 
         builder.ToString()
 
@@ -107,11 +136,11 @@ module CmdLine =
 
         builder.ToString()
 
-    let toStringForMsvcr doubleQuoteEscape cmdLine =
-        escape (MsvcrCommandLine.escapeArg doubleQuoteEscape) cmdLine
+    let toStringForMsvcr cmdLine =
+        escape (MsvcrCommandLine.escapeArg) cmdLine
 
     let toString cmdLine =
-        toStringForMsvcr false cmdLine
+        toStringForMsvcr cmdLine
 
     let fromSeq (values : string seq) =
         values |> Seq.fold (fun state o -> append o state) empty

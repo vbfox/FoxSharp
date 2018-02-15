@@ -7,7 +7,7 @@ open Expecto.Flip
 
 let verifyEscape expected argv =
     let result = MsvcrCommandLine.escape argv
-    Expect.equal expected result expected
+    Expect.equal expected expected result
 
 let escapeTests = [
     test "Multiple_parameters_are_separated_by_spaces" {
