@@ -39,7 +39,7 @@ module MsvcrCommandLine =
 
         escape 0 0
 
-    let escapeArg (arg : string) (builder : StringBuilder) =
+    let internal escapeArg (arg : string) (builder : StringBuilder) =
         builder.EnsureCapacity(arg.Length + builder.Length) |> ignore
 
         if arg.Length = 0 then
