@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <ArtifactsDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)/../artifacts/'))</ArtifactsDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.Stidgen.Build'">
+    <OutputPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/'))</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description>Strongly Typed ID type Generator</Description>
+    <PackageProjectUrl>https://github.com/vbfox/stidgen</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/stidgen/blob/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/vbfox/stidgen.git</RepositoryUrl>
+    <PackageTags>tools;codegen</PackageTags>
+    <Authors>Julien Roncaglia</Authors>
+    <Owners>Julien Roncaglia</Owners>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
+  </ItemGroup>
+  <Import Project="$(ArtifactsDir)/Version.props" Condition="exists('$(ArtifactsDir)/Version.props')" />
+</Project>
