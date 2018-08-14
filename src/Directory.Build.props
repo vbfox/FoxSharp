@@ -7,10 +7,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <Description>Strongly Typed ID type Generator</Description>
-    <PackageProjectUrl>https://github.com/vbfox/stidgen</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/vbfox/stidgen/blob/master/LICENSE.md</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/vbfox/stidgen.git</RepositoryUrl>
     <PackageTags>tools;codegen</PackageTags>
+    <PackageProjectUrl>https://github.com/vbfox/FoxSharp</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/FoxSharp/blob/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/vbfox/FoxSharp.git</RepositoryUrl>
     <Authors>Julien Roncaglia</Authors>
     <Owners>Julien Roncaglia</Owners>
   </PropertyGroup>
