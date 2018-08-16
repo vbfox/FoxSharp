@@ -6,8 +6,6 @@
     <OutputPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/'))</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>Strongly Typed ID type Generator</Description>
-    <PackageTags>tools;codegen</PackageTags>
     <PackageProjectUrl>https://github.com/vbfox/FoxSharp</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/vbfox/FoxSharp/blob/master/LICENSE.md</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/vbfox/FoxSharp.git</RepositoryUrl>
@@ -18,7 +16,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
+    <Compile Include="$(ArtifactsDir)/$(MSBuildProjectName)/Version.fs"  Condition="exists('$(ArtifactsDir)/$(MSBuildProjectName)/Version.fs')"/>
   </ItemGroup>
-  <Import Project="$(ArtifactsDir)/Version.props" Condition="exists('$(ArtifactsDir)/Version.props')" />
+  <Import Project="$(ArtifactsDir)/$(MSBuildProjectName)/Version.props" Condition="exists('$(ArtifactsDir)/$(MSBuildProjectName)/Version.props')" />
 </Project>
