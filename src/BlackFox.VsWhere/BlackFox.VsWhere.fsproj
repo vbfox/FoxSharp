@@ -12,6 +12,6 @@
     <None Include="paket.references" />
     <Compile Include="ComTypes.fs" />
     <Compile Include="Types.fs" />
-    <Compile Include="VsWhere.fs" />
+    <Compile Include="VsInstances.fs" />
   </ItemGroup>
 </Project>
