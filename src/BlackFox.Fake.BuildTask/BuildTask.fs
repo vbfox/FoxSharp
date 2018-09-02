@@ -113,9 +113,30 @@ let runOrList () =
 let listAvailable () =
     Target.listAvailable ()
 
+/// <summary>Writes a dependency graph.</summary>
+/// <param name="verbose">Whether to print verbose output or not.</param>
+/// <param name="target">The target for which the dependencies should be printed.</param>
 let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo) =
     match taskInfo.Metadata with
     | Some metadata ->
         Target.printDependencyGraph verbose metadata.Name
     | None ->
         failwith "No default task specified."
+
+/// Setup the FAKE context from a program argument
+///
+/// Arguments are the same as the ones comming after "run" when running via FAKE.
+/// The only difference is that "--target" is apended if the first argument doesn't start with "-".
+///
+/// Examples:
+///
+///  * `foo` -> `run --target foo`
+///  * `--target bar --baz` -> `run --target bar --baz`
+let setupContextFromArgv (argv: string list) =
+    let argvTweaked =
+        match argv with
+        | firstArg :: rest when not (firstArg.StartsWith("-")) ->
+            [ "--target"; firstArg ] @ rest
+        | _ -> argv
+    let execContext = Context.FakeExecutionContext.Create false "build.fsx" argvTweaked
+    Context.setExecutionContext (Fake.Core.Context.RuntimeContext.Fake execContext)
