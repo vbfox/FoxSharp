@@ -18,7 +18,7 @@ type ProjectToBuild = {
     Name: string
     BinDir: string
     ProjectFile: string
-    NupkgDir: string
+    NupkgFile: string
     ReleaseNotes: ReleaseNotes.ReleaseNotes
 }
 
@@ -49,23 +49,21 @@ let createAndGetDefault () =
             fromFile
 
     let createProjectInfo name =
+        let bindir = artifactsDir </> name </> (string configuration)
+        let releaseNotes = getReleaseNotes name
+        let nupkgFile = bindir </> (sprintf "%s.%s.nupkg" name releaseNotes.NugetVersion)
         {
             Name = name
-            BinDir = artifactsDir </> name </> (string configuration)
+            BinDir = bindir
             ProjectFile = srcDir </> name </> (name + ".fsproj")
-            NupkgDir = artifactsDir </> name </> (string configuration)
-            ReleaseNotes = getReleaseNotes name
+            NupkgFile = nupkgFile
+            ReleaseNotes = releaseNotes
         }
 
     let projects =
         [
             createProjectInfo "BlackFox.Fake.BuildTask"
         ]
-
-    /// GitHub info
-    let gitOwner = "vbfox"
-    let gitHome = "https://github.com/" + gitOwner
-    let gitName = "FoxSharp"
 
     let writeVersionProps (p: ProjectToBuild) =
         let projectRelease = getReleaseNotes p.Name
@@ -125,10 +123,8 @@ let createAndGetDefault () =
             DotNet.pack
                 (fun o -> { o with Configuration = configuration })
                 p.ProjectFile
-            let nupkgFile =
-                p.NupkgDir </> (sprintf "%s.%s.nupkg" p.Name projectRelease.NugetVersion)
 
-            Trace.publish ImportData.BuildArtifact nupkgFile
+            Trace.publish ImportData.BuildArtifact p.NupkgFile
     }
 
     let publishNuget = task "PublishNuget" [nuget] {
@@ -137,8 +133,9 @@ let createAndGetDefault () =
             | Some(key) -> key
             | None -> UserInput.getUserPassword "NuGet key: "
 
-        for p in projects do
-            Paket.push <| fun o ->  { o with WorkingDir = p.NupkgDir; ApiKey = key }
+        Paket.pushFiles
+            (fun o ->  { o with ApiKey = key })
+            (projects |> List.map (fun p -> p.NupkgFile))
     }
 
     let zip = task "Zip" [build] {
