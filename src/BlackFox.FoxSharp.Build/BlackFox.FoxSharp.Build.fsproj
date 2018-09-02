@@ -7,8 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <Compile Include="ExpectoDotNetCli.fs" />
-    <Compile Include="TypedTaskDefinitionHelper.fs" />
     <Compile Include="Tasks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

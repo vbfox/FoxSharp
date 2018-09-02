@@ -1,17 +1,13 @@
 ﻿module BlackFox.MasterOfFoo.Build.Tasks
 
-open Fake.Api
-open Fake.BuildServer
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.Testing
 open Fake.IO
-open Fake.IO.Globbing
 open Fake.IO.Globbing.Operators
 open Fake.IO.FileSystemOperators
-open Fake.Tools
 
-open BlackFox
-open BlackFox.TypedTaskDefinitionHelper
+open BlackFox.Fake
 open System.Xml.Linq
 
 type ProjectToBuild = {
@@ -78,21 +74,21 @@ let createAndGetDefault () =
         Directory.create (Path.getDirectory path)
         System.IO.File.WriteAllText(path, doc.ToString())
 
-    let init = task "Init" [] {
+    let init = BuildTask.create "Init" [] {
         Directory.create artifactsDir
     }
 
-    let clean = task "Clean" [init] {
+    let clean = BuildTask.create "Clean" [init] {
         let objDirs = projects |> List.map(fun p -> System.IO.Path.GetDirectoryName(p.ProjectFile) </> "obj")
         Shell.cleanDirs (artifactsDir :: objDirs)
     }
 
-    let generateVersionInfo = task "GenerateVersionInfo" [init; clean.IfNeeded] {
+    let generateVersionInfo = BuildTask.create "GenerateVersionInfo" [init; clean.IfNeeded] {
         for p in projects do
             writeVersionProps p
     }
 
-    let build = task "Build" [generateVersionInfo; clean.IfNeeded] {
+    let build = BuildTask.create "Build" [generateVersionInfo; clean.IfNeeded] {
         for p in projects do
             DotNet.build
                 (fun o -> { o with Configuration = configuration })
@@ -103,20 +99,20 @@ let createAndGetDefault () =
             testProjectFile
     }
 
-    let runTests = task "Test" [build] {
+    let runTests = BuildTask.create "Test" [build] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
         [
             baseTestDir </> "net461" </> (testProjectName + ".exe")
             baseTestDir </> "netcoreapp2.0" </> (testProjectName + ".dll")
         ]
-            |> ExpectoDotNetCli.run (fun p ->
+            |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
                     FailOnFocusedTests = true
                 })
     }
 
-    let nuget = task "NuGet" [build] {
+    let nuget = BuildTask.create "NuGet" [build] {
         for p in projects do
             let projectRelease = getReleaseNotes p.Name
 
@@ -127,7 +123,7 @@ let createAndGetDefault () =
             Trace.publish ImportData.BuildArtifact p.NupkgFile
     }
 
-    let publishNuget = task "PublishNuget" [nuget] {
+    let publishNuget = BuildTask.create "PublishNuget" [nuget] {
         let key =
             match Environment.environVarOrNone "nuget-key" with
             | Some(key) -> key
@@ -138,7 +134,7 @@ let createAndGetDefault () =
             (projects |> List.map (fun p -> p.NupkgFile))
     }
 
-    let zip = task "Zip" [build] {
+    let zip = BuildTask.create "Zip" [build] {
         for p in projects do
             let zipFile = artifactsDir </> (sprintf "%s-%s.zip" p.Name p.ReleaseNotes.NugetVersion)
             let comment = sprintf "%s v%s" p.Name p.ReleaseNotes.NugetVersion
@@ -151,7 +147,7 @@ let createAndGetDefault () =
             Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    let _releaseTask = EmptyTask "Release" [clean; publishNuget]
-    let _ciTask = EmptyTask "CI" [clean; runTests; zip; nuget]
+    let _releaseTask = BuildTask.createEmpty "Release" [clean; publishNuget]
+    let _ciTask = BuildTask.createEmpty "CI" [clean; runTests; zip; nuget]
 
-    EmptyTask "Default" [runTests]
+    BuildTask.createEmpty "Default" [runTests]
