@@ -14,32 +14,26 @@ open BlackFox
 open BlackFox.TypedTaskDefinitionHelper
 open System.Xml.Linq
 
+type ProjectToBuild = {
+    Name: string
+    BinDir: string
+    ProjectFile: string
+    NupkgDir: string
+    ReleaseNotes: ReleaseNotes.ReleaseNotes
+}
+
+let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
+let srcDir = rootDir </> "src"
+let artifactsDir = rootDir </> "artifacts"
+let testProjectName = "BlackFox.FoxSharp.Tests"
+let testProjectFile = srcDir </> testProjectName </> (testProjectName + ".fsproj")
+
 let createAndGetDefault () =
     let configuration = DotNet.BuildConfiguration.fromEnvironVarOrDefault "configuration" DotNet.BuildConfiguration.Release
 
-    let projectName = "BlackFox.Stidgen"
-    let testProjectName = projectName + ".Tests"
-    let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
-    let srcDir = rootDir </> "src"
-    let artifactsDir = rootDir </> "artifacts"
-    let nupkgDir = artifactsDir </> projectName </> (string configuration)
-    let projectFile = srcDir </> projectName </> (projectName + ".fsproj")
-    let projectBinDir = artifactsDir </> projectName </> (string configuration)
-    let solutionFile = srcDir </> "stidgen.sln"
-    let projects =
-        GlobbingPattern.createFrom srcDir
-        ++ "**/*.*proj"
-        -- "*.Build/*"
-
-    /// GitHub info
-    let gitOwner = "vbfox"
-    let gitHome = "https://github.com/" + gitOwner
-    let gitName = "stidgen"
-
     let inline versionPartOrZero x = if x < 0 then 0 else x
-
-    let release =
-        let fromFile = ReleaseNotes.load (rootDir </> "Release Notes.md")
+    let getReleaseNotes (projectName: string) =
+        let fromFile = ReleaseNotes.load (srcDir </> projectName </> "Release Notes.md")
         if BuildServer.buildServer <> BuildServer.LocalBuild then
             let buildVersion = int BuildServer.buildVersion
             let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion buildVersion
@@ -54,16 +48,36 @@ let createAndGetDefault () =
         else
             fromFile
 
-    Trace.setBuildNumber release.AssemblyVersion
+    let createProjectInfo name =
+        {
+            Name = name
+            BinDir = artifactsDir </> name </> (string configuration)
+            ProjectFile = srcDir </> name </> (name + ".fsproj")
+            NupkgDir = artifactsDir </> name </> (string configuration)
+            ReleaseNotes = getReleaseNotes name
+        }
 
-    let writeVersionProps() =
+    let projects =
+        [
+            createProjectInfo "BlackFox.Fake.BuildTask"
+        ]
+
+    /// GitHub info
+    let gitOwner = "vbfox"
+    let gitHome = "https://github.com/" + gitOwner
+    let gitName = "FoxSharp"
+
+    let writeVersionProps (p: ProjectToBuild) =
+        let projectRelease = getReleaseNotes p.Name
         let doc =
             XDocument(
                 XElement(XName.Get("Project"),
                     XElement(XName.Get("PropertyGroup"),
-                        XElement(XName.Get "Version", release.NugetVersion),
-                        XElement(XName.Get "PackageReleaseNotes", String.toLines release.Notes))))
-        let path = artifactsDir </> "Version.props"
+                        XElement(XName.Get "Version", projectRelease.NugetVersion),
+                        XElement(XName.Get "PackageReleaseNotes", String.toLines projectRelease.Notes))))
+        let path = artifactsDir </> p.Name </> "Version.props"
+
+        Directory.create (Path.getDirectory path)
         System.IO.File.WriteAllText(path, doc.ToString())
 
     let init = task "Init" [] {
@@ -71,19 +85,24 @@ let createAndGetDefault () =
     }
 
     let clean = task "Clean" [init] {
-        let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
+        let objDirs = projects |> List.map(fun p -> System.IO.Path.GetDirectoryName(p.ProjectFile) </> "obj")
         Shell.cleanDirs (artifactsDir :: objDirs)
     }
 
     let generateVersionInfo = task "GenerateVersionInfo" [init; clean.IfNeeded] {
-        writeVersionProps ()
-        AssemblyInfoFile.createFSharp (artifactsDir </> "Version.fs") [AssemblyInfo.Version release.AssemblyVersion]
+        for p in projects do
+            writeVersionProps p
     }
 
     let build = task "Build" [generateVersionInfo; clean.IfNeeded] {
+        for p in projects do
+            DotNet.build
+                (fun o -> { o with Configuration = configuration })
+                p.ProjectFile
+
         DotNet.build
-          (fun p -> { p with Configuration = configuration })
-          solutionFile
+            (fun o -> { o with Configuration = configuration })
+            testProjectFile
     }
 
     let runTests = task "Test" [build] {
@@ -100,14 +119,16 @@ let createAndGetDefault () =
     }
 
     let nuget = task "NuGet" [build] {
-        DotNet.pack
-            (fun p -> { p with Configuration = configuration })
-            projectFile
-        let nupkgFile =
-            nupkgDir
-                </> (sprintf "%s.%s.nupkg" projectName release.NugetVersion)
+        for p in projects do
+            let projectRelease = getReleaseNotes p.Name
 
-        Trace.publish ImportData.BuildArtifact nupkgFile
+            DotNet.pack
+                (fun o -> { o with Configuration = configuration })
+                p.ProjectFile
+            let nupkgFile =
+                p.NupkgDir </> (sprintf "%s.%s.nupkg" p.Name projectRelease.NugetVersion)
+
+            Trace.publish ImportData.BuildArtifact nupkgFile
     }
 
     let publishNuget = task "PublishNuget" [nuget] {
@@ -116,57 +137,24 @@ let createAndGetDefault () =
             | Some(key) -> key
             | None -> UserInput.getUserPassword "NuGet key: "
 
-        Paket.push <| fun p ->  { p with WorkingDir = nupkgDir; ApiKey = key }
+        for p in projects do
+            Paket.push <| fun o ->  { o with WorkingDir = p.NupkgDir; ApiKey = key }
     }
-
-    let zipFile = artifactsDir </> (sprintf "%s-%s.zip" projectName release.NugetVersion)
 
     let zip = task "Zip" [build] {
-        let comment = sprintf "%s v%s" projectName release.NugetVersion
-        GlobbingPattern.createFrom projectBinDir
-            ++ "**/*.dll"
-            ++ "**/*.xml"
-            -- "**/FSharp.Core.*"
-            |> Zip.createZip projectBinDir zipFile comment 9 false
+        for p in projects do
+            let zipFile = artifactsDir </> (sprintf "%s-%s.zip" p.Name p.ReleaseNotes.NugetVersion)
+            let comment = sprintf "%s v%s" p.Name p.ReleaseNotes.NugetVersion
+            GlobbingPattern.createFrom p.BinDir
+                ++ "**/*.dll"
+                ++ "**/*.xml"
+                -- "**/FSharp.Core.*"
+                |> Zip.createZip p.BinDir zipFile comment 9 false
 
-        Trace.publish ImportData.BuildArtifact zipFile
+            Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    let gitHubRelease = task "GitHubRelease" [zip] {
-        let user =
-            match Environment.environVarOrNone "github-user" with
-            | Some s -> s
-            | _ -> UserInput.getUserInput "GitHub Username: "
-        let pw =
-            match Environment.environVarOrNone "github-pw" with
-            | Some s -> s
-            | _ -> UserInput.getUserPassword "GitHub Password or Token: "
-
-        // release on github
-        GitHub.createClient user pw
-        |> GitHub.draftNewRelease
-            gitOwner
-            gitName
-            release.NugetVersion
-            (release.SemVer.PreRelease <> None)
-            (release.Notes)
-        |> GitHub.uploadFile zipFile
-        |> GitHub.publishDraft
-        |> Async.RunSynchronously
-    }
-
-    let gitRelease = task "GitRelease" [] {
-        let remote =
-            Git.CommandHelper.getGitResult "" "remote -v"
-            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-            |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
-        Git.Branches.tag "" release.NugetVersion
-        Git.Branches.pushTag "" remote release.NugetVersion
-    }
-
-    let _releaseTask = EmptyTask "Release" [clean; gitRelease; gitHubRelease; publishNuget]
+    let _releaseTask = EmptyTask "Release" [clean; publishNuget]
     let _ciTask = EmptyTask "CI" [clean; runTests; zip; nuget]
 
     EmptyTask "Default" [runTests]

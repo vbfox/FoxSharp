@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Typed `Target` for FAKE</Description>
+    <Description>Typed `Target` for FAKE 5</Description>
     <PackageTags>build;FAKE</PackageTags>
     <Version>0.1</Version>
   </PropertyGroup>

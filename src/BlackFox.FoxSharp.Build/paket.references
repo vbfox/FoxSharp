@@ -1,6 +1,7 @@
 ﻿group build
     FSharp.Core
     System.ValueTuple
+    BlackFox.Fake.BuildTask
 
     Fake.Core.Environment
     Fake.Core.Process

@@ -15,8 +15,5 @@
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="$(ArtifactsDir)/$(MSBuildProjectName)/Version.fs"  Condition="exists('$(ArtifactsDir)/$(MSBuildProjectName)/Version.fs')"/>
-  </ItemGroup>
   <Import Project="$(ArtifactsDir)/$(MSBuildProjectName)/Version.props" Condition="exists('$(ArtifactsDir)/$(MSBuildProjectName)/Version.props')" />
 </Project>
