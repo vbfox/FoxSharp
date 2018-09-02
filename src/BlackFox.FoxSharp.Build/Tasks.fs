@@ -60,6 +60,7 @@ let createAndGetDefault () =
         [
             createProjectInfo "BlackFox.Fake.BuildTask"
             createProjectInfo "BlackFox.VsWhere"
+            createProjectInfo "BlackFox.JavaPropertiesFile"
         ]
 
     let writeVersionProps (p: ProjectToBuild) =

@@ -2,15 +2,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Locate Visual Studio 2017 and newer installations</Description>
-    <PackageTags>FSharp;Visual Studio</PackageTags>
+    <Description>Parse JAVA .properties files</Description>
+    <PackageTags>FSharp;Java;properties</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComTypes.fs" />
-    <Compile Include="Types.fs" />
-    <Compile Include="VsInstances.fs" />
+    <Compile Include="JavaPropertiesFile.fs" />
   </ItemGroup>
 </Project>
