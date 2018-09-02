@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Locate Visual Studio 2017 and newer installations</Description>
+    <PackageTags>FSharp;Visual Studio</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+    <Compile Include="ComTypes.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="VsWhere.fs" />
+  </ItemGroup>
+</Project>

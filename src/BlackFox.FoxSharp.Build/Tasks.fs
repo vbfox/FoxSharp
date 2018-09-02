@@ -59,6 +59,7 @@ let createAndGetDefault () =
     let projects =
         [
             createProjectInfo "BlackFox.Fake.BuildTask"
+            createProjectInfo "BlackFox.VsWhere"
         ]
 
     let writeVersionProps (p: ProjectToBuild) =
