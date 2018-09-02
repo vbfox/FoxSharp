@@ -132,11 +132,11 @@ let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo) =
 ///
 ///  * `foo` -> `run --target foo`
 ///  * `--target bar --baz` -> `run --target bar --baz`
-let setupContextFromArgv (argv: string list) =
+let setupContextFromArgv (argv: string []) =
     let argvTweaked =
-        match argv with
+        match List.ofArray argv with
         | firstArg :: rest when not (firstArg.StartsWith("-")) ->
             [ "--target"; firstArg ] @ rest
-        | _ -> argv
+        | argv -> argv
     let execContext = Context.FakeExecutionContext.Create false "build.fsx" argvTweaked
     Context.setExecutionContext (Fake.Core.Context.RuntimeContext.Fake execContext)

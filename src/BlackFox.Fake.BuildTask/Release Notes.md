@@ -1,3 +1,7 @@
+### New in 0.1.2
+
+* Change `BuildTask.setupContextFromArgv` to take an array instead of a list
+
 ### New in 0.1.1
 
 * `BuildTask.setupContextFromArgv` an API not specific to BuildTask but that make using FAKE from a normal program
