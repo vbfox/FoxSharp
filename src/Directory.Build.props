@@ -16,6 +16,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <Import Project="$(ArtifactsDir)/$(MSBuildProjectName)/Version.props" Condition="exists('$(ArtifactsDir)/$(MSBuildProjectName)/Version.props')" />
 </Project>
