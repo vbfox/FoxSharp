@@ -45,8 +45,8 @@ let private parsePackageReference (instance: ISetupPackageReference) =
 let private parseErrorState (state: ISetupErrorState) =
     let result =
         {
-            FailedPackages = state.GetFailedPackages() |> Seq.map parsePackageReference |> List.ofSeq
-            SkippedPackages = state.GetSkippedPackages() |> Seq.map parsePackageReference |> List.ofSeq
+            FailedPackages = state.GetFailedPackages() |> Seq.map parsePackageReference |> Array.ofSeq
+            SkippedPackages = state.GetSkippedPackages() |> Seq.map parsePackageReference |> Array.ofSeq
             ErrorLogFilePath = None
             LogFilePath = None
             RuntimeError = None
@@ -90,7 +90,7 @@ let private parseInstance (instance: ISetupInstance) =
         DisplayName = instance.GetDisplayName(0)
         Description = instance.GetDescription(0)
         State = None
-        Packages = []
+        Packages = Array.empty
         Product = None
         ProductPath = None
         Errors = None
@@ -112,7 +112,7 @@ let private parseInstance (instance: ISetupInstance) =
     | :? ISetupInstance2 as v2 ->
         { result with
             State = v2.GetState() |> Some
-            Packages = v2.GetPackages() |> Seq.map parsePackageReference |> List.ofSeq
+            Packages = v2.GetPackages() |> Seq.map parsePackageReference |> Array.ofSeq
             Product = parsePackageReference (v2.GetProduct()) |> Some
             ProductPath = v2.GetProductPath() |> Some
             Errors = v2.GetErrors() |> Option.ofObj |> Option.map parseErrorState
@@ -122,11 +122,13 @@ let private parseInstance (instance: ISetupInstance) =
             EnginePath = v2.GetEnginePath() |> Some }
     | _ -> result
 
+/// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
+[<CompiledName("GetAll")>]
 let getAll () =
     try
         enumAllInstances ()
         |> Seq.map parseInstance
-        |> List.ofSeq
+        |> Array.ofSeq
     with
     | :? COMException ->
-        []
+        Array.empty

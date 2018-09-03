@@ -18,8 +18,8 @@ type VsSetupErrorInfo =
     ErrorMessage: string }
 
 type VsSetupErrorState =
-  { FailedPackages: VsSetupPackage list
-    SkippedPackages: VsSetupPackage list
+  { FailedPackages: VsSetupPackage []
+    SkippedPackages: VsSetupPackage []
     ErrorLogFilePath: string option
     LogFilePath: string option
     RuntimeError: VsSetupErrorInfo option }
@@ -34,7 +34,7 @@ type VsSetupInstance =
         DisplayName: string
         Description: string
         State: InstanceState option
-        Packages: VsSetupPackage list
+        Packages: VsSetupPackage []
         Product: VsSetupPackage option
         ProductPath: string option
         Errors: VsSetupErrorState option

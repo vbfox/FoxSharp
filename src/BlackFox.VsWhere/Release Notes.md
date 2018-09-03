@@ -1,3 +1,7 @@
+### New in 0.2
+
+* Return an array
+
 ### New in 0.1.1
 
 * Build for net45
