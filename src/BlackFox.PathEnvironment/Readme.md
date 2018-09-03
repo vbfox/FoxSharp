@@ -7,20 +7,28 @@ shell.
 
 ## API
 
-* `path: Lazy<string list>`: Directories in the system PATH.
-* `pathExt: Lazy<string list>` Extensions considered executables by the system.
-  Parsed from `PATHEXT` on windows and always return `[""]` on other systems.
-* `findInPathOnly: string -> string option`: Find an executable in `PATH` (Extension is optional if present in
-  `PATHEXT`)
-* `find: string -> string option`: Find an executable in the current directory or `PATH` (Extension is optional if
-  present in `PATHEXT`)
+```fsharp
+type BlackFox.PathEnvironment =
+    // Directories in the system PATH.
+    path: string []
+
+    // Extensions considered executables by the system.
+    // Parsed from `PATHEXT` on windows and always return `[""]` on other systems.
+    pathExt: string []
+
+    // Find an executable on the PATH
+    findExecutable: name: string -> includeCurrentDirectory: bool -> string option
+
+    // Find a file on the PATH
+    findFile: name: string -> includeCurrentDirectory: bool -> string option
+```
 
 ## Example
 
 ```fsharp
-open BlackFox.PathEnvironment
+open BlackFox
 
-match find "node" with
+match PathEnvironment.findExecutable "node" false with
 | None -> failwith "nodejs wasn't found"
 | nodePath -> // ...
 ```

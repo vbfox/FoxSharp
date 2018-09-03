@@ -1,9 +1,9 @@
-module BlackFox.PathEnvironment
+namespace BlackFox
 
 open System
 open System.IO
 
-module private Utils =
+module private PathEnvironmentUtils =
     let findFileInDirs dirs names =
         dirs
         |> Seq.collect (fun dir -> names |> List.map (fun name -> Path.Combine(dir, name)))
@@ -18,29 +18,42 @@ module private Utils =
         if isNull name then "" else value
 
     let getPath () =
-        (envVarOrEmpty "PATH").Split(Path.PathSeparator) |> List.ofArray
+        (envVarOrEmpty "PATH").Split(Path.PathSeparator)
 
     let getPathExt () =
         if Environment.OSVersion.Platform = PlatformID.Win32NT then
-            (envVarOrEmpty "PATHEXT").Split(Path.PathSeparator) |> List.ofArray
+            (envVarOrEmpty "PATHEXT").Split(Path.PathSeparator)
         else
-            [""]
+            [|""|]
 
-open Utils
+    let addCwd (includeCurrentDirectory: bool) (arr: string []) =
+        if includeCurrentDirectory then
+            Array.concat [ [|Environment.CurrentDirectory |]; arr ]
+         else
+            arr
 
-/// Directories in the system PATH
-let path =
-    lazy (getPath())
+open PathEnvironmentUtils
 
-/// Extensions considered executables by the system.
-/// Parsed from `PATHEXT` on windows and always return `[""]` on other systems
-let pathExt =
-    lazy (getPathExt())
+type PathEnvironment =
+    /// Directories in the system PATH
+    [<CompiledName("Path")>]
+    static member path
+        with get() = getPath()
 
-/// Find an executable in PATH (Extension is optional if present in PATHEXT)
-let findInPathOnly name =
-    findProgramInDirs path.Value pathExt.Value name
+    /// Extensions considered executables by the system.
+    /// Parsed from `PATHEXT` on windows and always return `[|""|]` on other systems
+    [<CompiledName("PathExt")>]
+    static member pathExt
+        with get() = getPathExt()
 
-/// Find an executable in the current directory or PATH (Extension is optional if present in PATHEXT)
-let find name =
-    findProgramInDirs (Environment.CurrentDirectory :: path.Value) pathExt.Value name
+    /// Find an executable on the PATH
+    [<CompiledName("FindExecutable")>]
+    static member findExecutable (name: string) (includeCurrentDirectory: bool) =
+        let dirs = addCwd includeCurrentDirectory PathEnvironment.path
+        findProgramInDirs dirs (PathEnvironment.pathExt |> List.ofArray) name
+
+    /// Find a file on the PATH
+    [<CompiledName("FindFile")>]
+    static member findFile (name: string) (includeCurrentDirectory: bool) =
+        let dirs = addCwd includeCurrentDirectory PathEnvironment.path
+        findFileInDirs dirs [name]
