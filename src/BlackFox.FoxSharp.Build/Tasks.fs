@@ -92,18 +92,22 @@ let createAndGetDefault () =
             writeVersionProps p
     }
 
-    let build = BuildTask.create "Build" [generateVersionInfo; clean.IfNeeded] {
+    let buildLibraries = BuildTask.create "BuildLibraries" [generateVersionInfo; clean.IfNeeded] {
         for p in projects do
             DotNet.build
                 (fun o -> { o with Configuration = configuration })
                 p.ProjectFile
+    }
 
+    let buildTests = BuildTask.create "BuildTests" [generateVersionInfo; clean.IfNeeded] {
         DotNet.build
             (fun o -> { o with Configuration = configuration })
             testProjectFile
     }
 
-    let runTests = BuildTask.create "Test" [build] {
+    let build = BuildTask.createEmpty "Build" [buildLibraries; buildTests]
+
+    let runTests = BuildTask.create "Test" [buildTests] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
         [
             baseTestDir </> "net461" </> (testProjectName + ".exe")
@@ -118,8 +122,6 @@ let createAndGetDefault () =
 
     let nuget = BuildTask.create "NuGet" [build] {
         for p in projects do
-            let projectRelease = getReleaseNotes p.Name
-
             DotNet.pack
                 (fun o -> { o with Configuration = configuration })
                 p.ProjectFile
@@ -152,6 +154,6 @@ let createAndGetDefault () =
     }
 
     let _releaseTask = BuildTask.createEmpty "Release" [clean; publishNuget]
-    let _ciTask = BuildTask.createEmpty "CI" [clean; runTests; zip; nuget]
+    let _ciTask = BuildTask.createEmpty "CI" [clean; build; runTests; zip; nuget]
 
-    BuildTask.createEmpty "Default" [runTests]
+    BuildTask.createEmpty "Default" [build; runTests]

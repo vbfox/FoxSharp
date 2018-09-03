@@ -1,9 +1,8 @@
-module BlackFox.CommandLine.Tests.MsvcrCommandLineEscapeTests
+module BlackFox.FoxSharp.Tests.MsvcrCommandLineEscapeTests
 
 open Expecto
-
-open BlackFox.CommandLine
 open Expecto.Flip
+open BlackFox.CommandLine
 
 let verifyEscape expected argv =
     let result = MsvcrCommandLine.escape argv

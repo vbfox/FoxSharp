@@ -6,11 +6,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="JavaPropertiesFileTests.fs" />
     <Compile Include="MsvcrCommandLineTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlackFox.CommandLine\BlackFox.CommandLine.fsproj" />
+    <ProjectReference Include="..\BlackFox.JavaPropertiesFile\BlackFox.JavaPropertiesFile.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
