@@ -1,9 +1,11 @@
-# VSWhere: Visual Studio Locator
+# Visual Studio 2017+ Locator
+
+[![Nuget Package](https://img.shields.io/nuget/v/BlackFox.VsWhere.svg)](https://www.nuget.org/packages/BlackFox.VsWhere)
 
 A NuGet package to detect Visual Studio 2017+ installs from F# code similar to the
 [vswhere](https://github.com/Microsoft/vswhere) binary.
 
-*Note: The API is also usable in other .NET language but exposes some F# specific types*
+*Note: The API is also usable in other .NET languages but exposes some F# specific types*
 
 ## API
 

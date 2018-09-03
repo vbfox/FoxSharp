@@ -1,12 +1,11 @@
 🦊 Sharp
 ========
 
-A collection of F# modules.
+A collection of .Net NuGet packages that I maintain, developed in F#.
 
-Each module/file is made to be used with [Paket][Paket]'s [GitHub dependencies][GhDeps] feature.
-
-[Paket]: https://fsprojects.github.io
-[GhDeps]: https://fsprojects.github.io/Paket/github-dependencies.html
+|Badge|Name|Description|
+|-----|----|-----------|
+|[![Nuget Package](https://img.shields.io/nuget/v/BlackFox.VsWhere.svg)](https://www.nuget.org/packages/BlackFox.VsWhere)|[BlackFox.VsWhere](src/BlackFox.VsWhere/Readme.md)|Visual Studio 2017+ Locator|
 
 Path environment
 ----------------
