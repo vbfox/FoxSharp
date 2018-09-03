@@ -1,3 +1,7 @@
+### New in 0.2.3
+
+* Add getCompleted
+
 ### New in 0.2.2
 
 * Return an empty array on non-windows

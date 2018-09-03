@@ -122,7 +122,10 @@ let private parseInstance (instance: ISetupInstance) =
             EnginePath = v2.GetEnginePath() |> Some }
     | _ -> result
 
+/// <summary>
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
+/// <para>This method return instances that have installation errors and pre-releases.</para>
+/// </summary>
 [<CompiledName("GetAll")>]
 let getAll (): VsSetupInstance [] =
     if Environment.OSVersion.Platform <> PlatformID.Win32NT then
@@ -137,7 +140,17 @@ let getAll (): VsSetupInstance [] =
         | :? COMException ->
             Array.empty
 
-/// Get VS2017+ instances that have a specific package ID installed
+/// Get VS2017+ instances that are completely installed
+[<CompiledName("GetCompleted")>]
+let getCompleted (includePrerelease: bool): VsSetupInstance [] =
+    getAll ()
+    |> Array.filter (fun vs ->
+        (vs.IsComplete = None || vs.IsComplete = Some true)
+        && (includePrerelease || vs.IsPrerelease <> Some true)
+    )
+
+
+/// Get VS2017+ instances that are completely installed and have a specific package ID installed
 [<CompiledName("GetWithPackage")>]
 let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance [] =
     getAll ()
