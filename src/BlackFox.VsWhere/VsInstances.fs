@@ -124,7 +124,7 @@ let private parseInstance (instance: ISetupInstance) =
 
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
 [<CompiledName("GetAll")>]
-let getAll () =
+let getAll (): VsSetupInstance [] =
     if Environment.OSVersion.Platform <> PlatformID.Win32NT then
         // No Visual Studio outside of windows
         Array.empty
@@ -139,7 +139,7 @@ let getAll () =
 
 /// Get VS2017+ instances that have a specific package ID installed
 [<CompiledName("GetWithPackage")>]
-let getWithPackage (packageId: string) (includePrerelease) =
+let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance [] =
     getAll ()
     |> Array.filter (fun vs ->
         (vs.IsComplete = None || vs.IsComplete = Some true)
