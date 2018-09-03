@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Parse and escape command lines</Description>
+    <PackageTags>FSharp;CommandLine</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommandLine.fs" />
+  </ItemGroup>
+</Project>
