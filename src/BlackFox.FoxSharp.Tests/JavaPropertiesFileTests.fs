@@ -2,13 +2,12 @@ module BlackFox.FoxSharp.Tests.JavaPropertiesFileTests
 
 open Expecto
 open Expecto.Flip
-open BlackFox
 open BlackFox.JavaPropertiesFile
 
 [<Tests>]
 let empty = test "Parse empty" {
     let expected = List.empty
-    let actual = JavaPropertiesFile.parseString ""
+    let actual = JavaPropertiesFile.parseString "" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -18,7 +17,7 @@ let simple = test "Parse simple" {
         Comment "Hello world"
         KeyValue ("key", "value")
     ]
-    let actual = JavaPropertiesFile.parseString "#Hello world\nkey=value"
+    let actual = JavaPropertiesFile.parseString "#Hello world\nkey=value" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -27,7 +26,7 @@ let twoPoints = test "Parse :" {
     let expected = [
         KeyValue ("key", "value")
     ]
-    let actual = JavaPropertiesFile.parseString "key:value"
+    let actual = JavaPropertiesFile.parseString "key:value" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -36,7 +35,7 @@ let ignoreWhiteSpace = test "Ignore whitespace in the middle" {
     let expected = [
         KeyValue ("key", "value")
     ]
-    let actual = JavaPropertiesFile.parseString "key  :   value"
+    let actual = JavaPropertiesFile.parseString "key  :   value" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -45,7 +44,7 @@ let endWhiteSpace = test "End whitespace is kept as part of the value" {
     let expected = [
         KeyValue ("key", "value   ")
     ]
-    let actual = JavaPropertiesFile.parseString "key:value   "
+    let actual = JavaPropertiesFile.parseString "key:value   " |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -54,7 +53,7 @@ let multipleLines = test "Property can span multiple lines" {
     let expected = [
         KeyValue ("key", "Hello World")
     ]
-    let actual = JavaPropertiesFile.parseString "key=\\\n    Hello \\\n     World"
+    let actual = JavaPropertiesFile.parseString "key=\\\n    Hello \\\n     World" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -63,7 +62,7 @@ let specialChars = test "Special characters can be present" {
     let expected = [
         KeyValue ("key", "Hello\nWorld\t!\r")
     ]
-    let actual = JavaPropertiesFile.parseString "key=Hello\\nWorld\\t!\\r"
+    let actual = JavaPropertiesFile.parseString "key=Hello\\nWorld\\t!\\r" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -72,7 +71,7 @@ let escapedBackslash = test "Escaped backslash works" {
     let expected = [
         KeyValue ("key", "Hello\\World")
     ]
-    let actual = JavaPropertiesFile.parseString "key=Hello\\\\World"
+    let actual = JavaPropertiesFile.parseString "key=Hello\\\\World" |> List.ofArray
     Expect.equal "" expected actual
 }
 
@@ -81,6 +80,6 @@ let unicode = test "Unicode can be escaped" {
     let expected = [
         KeyValue ("key", "Hello\u0001World")
     ]
-    let actual = JavaPropertiesFile.parseString "key=Hello\\u0001World"
+    let actual = JavaPropertiesFile.parseString "key=Hello\\u0001World" |> List.ofArray
     Expect.equal "" expected actual
 }

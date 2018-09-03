@@ -11,6 +11,8 @@
     <PackageReference Include="FSharp.Core" Version="4.2.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Parser.fs" />
     <Compile Include="JavaPropertiesFile.fs" />
   </ItemGroup>
 </Project>
