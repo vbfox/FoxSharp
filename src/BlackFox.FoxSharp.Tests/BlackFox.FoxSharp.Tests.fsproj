@@ -10,7 +10,7 @@
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BlackFox.FoxSharp\BlackFox.FoxSharp.fsproj" />
+    <ProjectReference Include="..\BlackFox.CommandLine\BlackFox.CommandLine.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
