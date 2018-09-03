@@ -62,6 +62,7 @@ let createAndGetDefault () =
             createProjectInfo "BlackFox.VsWhere"
             createProjectInfo "BlackFox.JavaPropertiesFile"
             createProjectInfo "BlackFox.CommandLine"
+            createProjectInfo "BlackFox.PathEnvironment"
         ]
 
     let writeVersionProps (p: ProjectToBuild) =

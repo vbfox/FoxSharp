@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Parse PATH environment variable and find programs on it</Description>
+    <PackageTags>FSharp;Path;Environment</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PathEnvironment.fs" />
+  </ItemGroup>
+</Project>
