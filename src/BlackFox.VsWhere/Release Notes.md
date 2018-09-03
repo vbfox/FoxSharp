@@ -1,3 +1,7 @@
+### New in 0.2.2
+
+* Return an empty array on non-windows
+
 ### New in 0.2.1
 
 * Add getWithPackage

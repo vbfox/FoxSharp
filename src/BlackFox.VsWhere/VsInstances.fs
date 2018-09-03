@@ -125,13 +125,17 @@ let private parseInstance (instance: ISetupInstance) =
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
 [<CompiledName("GetAll")>]
 let getAll () =
-    try
-        enumAllInstances ()
-        |> Seq.map parseInstance
-        |> Array.ofSeq
-    with
-    | :? COMException ->
+    if Environment.OSVersion.Platform <> PlatformID.Win32NT then
+        // No Visual Studio outside of windows
         Array.empty
+    else
+        try
+            enumAllInstances ()
+            |> Seq.map parseInstance
+            |> Array.ofSeq
+        with
+        | :? COMException ->
+            Array.empty
 
 /// Get VS2017+ instances that have a specific package ID installed
 [<CompiledName("GetWithPackage")>]
