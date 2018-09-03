@@ -1,3 +1,7 @@
+### New in 0.2.1
+
+* Add getWithPackage
+
 ### New in 0.2
 
 * Return an array

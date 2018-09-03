@@ -132,3 +132,13 @@ let getAll () =
     with
     | :? COMException ->
         Array.empty
+
+/// Get VS2017+ instances that have a specific package ID installed
+[<CompiledName("GetWithPackage")>]
+let getWithPackage (packageId: string) (includePrerelease) =
+    getAll ()
+    |> Array.filter (fun vs ->
+        (vs.IsComplete = None || vs.IsComplete = Some true)
+        && (includePrerelease || vs.IsPrerelease <> Some true)
+        && vs.Packages |> Array.exists (fun p -> p.Id = packageId)
+    )
