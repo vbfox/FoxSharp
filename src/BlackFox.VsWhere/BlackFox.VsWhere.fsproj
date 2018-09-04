@@ -5,6 +5,7 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;$(TargetFrameworks)</TargetFrameworks>
     <Description>Locate Visual Studio 2017 and newer installations</Description>
     <PackageTags>FSharp;Visual Studio</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.VsWhere/Icon.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.0.0.1" Condition="'$(TargetFramework)' == 'net45'" />

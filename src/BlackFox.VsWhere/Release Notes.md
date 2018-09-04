@@ -1,3 +1,7 @@
+### New in 0.2.4
+
+* Package icon
+
 ### New in 0.2.3
 
 * Add getCompleted
