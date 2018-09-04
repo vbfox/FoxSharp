@@ -149,7 +149,6 @@ let getCompleted (includePrerelease: bool): VsSetupInstance [] =
         && (includePrerelease || vs.IsPrerelease <> Some true)
     )
 
-
 /// Get VS2017+ instances that are completely installed and have a specific package ID installed
 [<CompiledName("GetWithPackage")>]
 let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance [] =
