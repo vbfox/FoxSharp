@@ -138,11 +138,11 @@ let parseWithReader reader =
     let buffer = StringBuilder(255)
     let mutable isEof = IsEof.No
 
-    [|
+    [
         while isEof <> IsEof.Yes do
             let line, isEofAfterLine = readLine reader buffer
             match line with
             | Some line -> yield line
             | None -> ()
             isEof <- isEofAfterLine
-    |]
+    ]

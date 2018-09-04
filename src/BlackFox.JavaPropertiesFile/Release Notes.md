@@ -1,3 +1,7 @@
+### New in 0.3.0
+
+* Back to F# Lists
+
 ### New in 0.2.0
 
 * Cleanup the API and make it a little more C# friendly
