@@ -1,5 +1,7 @@
 # Visual Studio 2017+ Locator
 
+![Logo '?VS'](https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.VsWhere/Icon.png)
+
 [![Nuget Package](https://img.shields.io/nuget/v/BlackFox.VsWhere.svg)](https://www.nuget.org/packages/BlackFox.VsWhere)
 
 A NuGet package to detect Visual Studio 2017+ installs from F# code similar to the
