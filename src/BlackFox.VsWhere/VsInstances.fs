@@ -45,8 +45,8 @@ let private parsePackageReference (instance: ISetupPackageReference) =
 let private parseErrorState (state: ISetupErrorState) =
     let result =
         {
-            FailedPackages = state.GetFailedPackages() |> Seq.map parsePackageReference |> Array.ofSeq
-            SkippedPackages = state.GetSkippedPackages() |> Seq.map parsePackageReference |> Array.ofSeq
+            FailedPackages = state.GetFailedPackages() |> Seq.map parsePackageReference |> List.ofSeq
+            SkippedPackages = state.GetSkippedPackages() |> Seq.map parsePackageReference |> List.ofSeq
             ErrorLogFilePath = None
             LogFilePath = None
             RuntimeError = None
@@ -90,7 +90,7 @@ let private parseInstance (instance: ISetupInstance) =
         DisplayName = instance.GetDisplayName(0)
         Description = instance.GetDescription(0)
         State = None
-        Packages = Array.empty
+        Packages = List.empty
         Product = None
         ProductPath = None
         Errors = None
@@ -112,7 +112,7 @@ let private parseInstance (instance: ISetupInstance) =
     | :? ISetupInstance2 as v2 ->
         { result with
             State = v2.GetState() |> Some
-            Packages = v2.GetPackages() |> Seq.map parsePackageReference |> Array.ofSeq
+            Packages = v2.GetPackages() |> Seq.map parsePackageReference |> List.ofSeq
             Product = parsePackageReference (v2.GetProduct()) |> Some
             ProductPath = v2.GetProductPath() |> Some
             Errors = v2.GetErrors() |> Option.ofObj |> Option.map parseErrorState
@@ -127,34 +127,34 @@ let private parseInstance (instance: ISetupInstance) =
 /// <para>This method return instances that have installation errors and pre-releases.</para>
 /// </summary>
 [<CompiledName("GetAll")>]
-let getAll (): VsSetupInstance [] =
+let getAll (): VsSetupInstance list =
     if Environment.OSVersion.Platform <> PlatformID.Win32NT then
         // No Visual Studio outside of windows
-        Array.empty
+        List.empty
     else
         try
             enumAllInstances ()
             |> Seq.map parseInstance
-            |> Array.ofSeq
+            |> List.ofSeq
         with
         | :? COMException ->
-            Array.empty
+            List.empty
 
 /// Get VS2017+ instances that are completely installed
 [<CompiledName("GetCompleted")>]
-let getCompleted (includePrerelease: bool): VsSetupInstance [] =
+let getCompleted (includePrerelease: bool): VsSetupInstance list =
     getAll ()
-    |> Array.filter (fun vs ->
+    |> List.filter (fun vs ->
         (vs.IsComplete = None || vs.IsComplete = Some true)
         && (includePrerelease || vs.IsPrerelease <> Some true)
     )
 
 /// Get VS2017+ instances that are completely installed and have a specific package ID installed
 [<CompiledName("GetWithPackage")>]
-let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance [] =
+let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance list =
     getAll ()
-    |> Array.filter (fun vs ->
+    |> List.filter (fun vs ->
         (vs.IsComplete = None || vs.IsComplete = Some true)
         && (includePrerelease || vs.IsPrerelease <> Some true)
-        && vs.Packages |> Array.exists (fun p -> p.Id = packageId)
+        && vs.Packages |> List.exists (fun p -> p.Id = packageId)
     )

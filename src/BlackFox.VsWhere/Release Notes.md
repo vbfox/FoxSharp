@@ -1,3 +1,7 @@
+### New in 0.3.0
+
+* Use F# lists (again)
+
 ### New in 0.2.4
 
 * Package icon
