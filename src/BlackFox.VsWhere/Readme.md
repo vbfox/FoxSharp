@@ -22,8 +22,9 @@ module BlackFox.VsWhere.VsInstances =
 
     /// Get VS2017+ instances that are completely installed and have a specific package ID installed
     let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance list =
-
 ```
+
+Package IDs for components and worksloads [are documented on docs.microsoft.com](https://docs.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2017).
 
 ## Sample usage
 
