@@ -1,3 +1,7 @@
+### New in 0.3.1
+
+* Fix a bug in VsSetupPackage Version (The value was the ID instead of the version)
+
 ### New in 0.3.0
 
 * Use F# lists (again)

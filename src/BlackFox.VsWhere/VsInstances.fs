@@ -33,7 +33,7 @@ let private parseErrorInfo (error: ISetupErrorInfo) =
 let private parsePackageReference (instance: ISetupPackageReference) =
     {
         Id = instance.GetId()
-        Version = instance.GetId()
+        Version = instance.GetVersion()
         Chip = instance.GetChip()
         Language = instance.GetLanguage()
         Branch = instance.GetBranch()
