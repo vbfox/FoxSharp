@@ -11,8 +11,16 @@ A NuGet package to detect Visual Studio 2017+ installs from F# code similar to t
 
 ```fsharp
 module BlackFox.VsWhere.VsInstances =
-    let getAll (): VsSetupInstance [] =
-    let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance [] =
+    /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
+    /// This method return instances that have installation errors and pre-releases.
+    let getAll (): VsSetupInstance list =
+
+    /// Get VS2017+ instances that are completely installed
+    let getCompleted (includePrerelease: bool): VsSetupInstance list =
+
+    /// Get VS2017+ instances that are completely installed and have a specific package ID installed
+    let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance list =
+
 ```
 
 ## Sample usage
@@ -22,7 +30,7 @@ Find MSBuild:
 ```fsharp
 let instance =
     VsInstances.getWithPackage "Microsoft.Component.MSBuild" false
-    |> Array.tryHead
+    |> List.tryHead
 
 match instance with
 | None -> printfn "No MSBuild"
@@ -31,10 +39,10 @@ match instance with
     printfn "MSBuild: %s" msbuild
 ```
 
-Start Developer Command Prompt
+Start Developer Command Prompt:
 
 ```fsharp
-match VsInstances.getCompleted false |> Array.tryHead with
+match VsInstances.getCompleted false |> List.tryHead with
 | None -> printfn "No VS"
 | Some vs ->
     let vsdevcmd = Path.Combine(vs.InstallationPath, "Common7\\Tools\\vsdevcmd.bat")
