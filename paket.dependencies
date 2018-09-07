@@ -6,6 +6,8 @@ storage:none
 
 nuget FSharp.Core
 nuget Expecto
+nuget Expecto.FsCheck
+nuget FsCheck
 
 // Build infrastructure
 group build

@@ -146,3 +146,14 @@ let test =
         testList "escape" escapeTests
         testList "parse" parseTests
     ]
+
+open FsCheck
+
+[<Tests>]
+let propertyBasedTests =
+    testProperty "Escape is the inverse of Parse" <|
+        fun (x: NonNull<string> list) ->
+            let input = x |> List.map (fun (NonNull s) -> s)
+            let escaped = MsvcrCommandLine.escape input
+            let backAgain = MsvcrCommandLine.parse escaped
+            Expect.equal "First Name should not be null" input backAgain

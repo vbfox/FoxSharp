@@ -10,6 +10,14 @@ NUGET
       Argu (>= 5.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (>= netstandard2.0)) (>= net461)
       Mono.Cecil (>= 0.10) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (>= netstandard2.0)) (>= net461)
       System.Diagnostics.FileVersionInfo (>= 4.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net461) (>= netstandard2.0))
+    Expecto.FsCheck (8.2.2)
+      Expecto (>= 8.2.2) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (>= netstandard2.0)) (>= net461)
+      FsCheck (>= 2.10.4) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (>= netstandard2.0)) (>= net461)
+    FsCheck (2.11)
+      FSharp.Core (>= 4.0.0.1) - restriction: || (&& (== netcoreapp2.0) (< netstandard1.6)) (&& (== netcoreapp2.0) (< portable-net45+win8+wp8)) (&& (== netstandard2.0) (< netstandard1.6)) (&& (== netstandard2.0) (< portable-net45+win8+wp8)) (&& (>= net45) (< netstandard1.6)) (&& (>= net45) (< portable-net45+win8+wp8)) (>= net452)
+      FSharp.Core (>= 4.3.4) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net452) (>= netstandard1.6))
+      NETStandard.Library (>= 1.6.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net452) (>= netstandard1.6))
+      System.ValueTuple (>= 4.5) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net452) (>= netstandard1.6))
     FSharp.Core (4.5.2)
     Microsoft.NETCore.Platforms (2.1.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= dnxcore50) (>= net45) (>= netstandard2.0)) (&& (>= net45) (< net46) (>= netstandard2.0)) (&& (>= net461) (>= netcoreapp2.0))
     Microsoft.NETCore.Targets (2.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= dnxcore50) (>= net45) (>= netstandard2.0))
@@ -22,6 +30,8 @@ NUGET
       System.Security.Cryptography.Algorithms (>= 4.2) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard1.3))
       System.Security.Cryptography.Csp (>= 4.0) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard1.3))
       System.Threading (>= 4.0.11) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard1.3))
+    NETStandard.Library (2.0.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net452) (>= netstandard1.6))
+      Microsoft.NETCore.Platforms (>= 1.1)
     runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard2.0)) (&& (< net35) (>= net461) (>= netstandard1.6))
     runtime.debian.9-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard2.0)) (&& (< net35) (>= net461) (>= netstandard1.6))
     runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (< net35) (>= net45) (>= netstandard2.0)) (&& (< net35) (>= net461) (>= netstandard1.6))
@@ -238,6 +248,7 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= dnxcore50) (>= net45))
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= dnxcore50) (>= net45))
       System.Runtime (>= 4.3) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= dnxcore50) (>= net45))
+    System.ValueTuple (4.5) - restriction: || (== netcoreapp2.0) (== netstandard2.0) (&& (>= net45) (< net452) (>= netstandard1.6))
 
 GROUP build
 STORAGE: NONE
