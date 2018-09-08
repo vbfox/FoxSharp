@@ -49,12 +49,24 @@ let escapeTests = [
         verifyEscape @"Hello\\\""World" [@"Hello\""World"]
     }
 
-    test "Odd_backslash_escaped" {
-        verifyEscape @"""a\\\\b c"" d e" [@"a\\b c"; "d"; "e"]
+    test "Microsoft_sample_1" {
+        verifyEscape @"""a b c"" d e" ["a b c" ;"d" ;"e"]
     }
 
-    test "Even_backslash_escaped" {
-        verifyEscape @"""a\\\\\b c"" d e" [@"a\\\b c"; "d"; "e"]
+    test "Microsoft_sample_2" {
+        verifyEscape @"ab\""c \ d" ["ab\"c" ;"\\" ;"d"]
+    }
+
+    test "Microsoft_sample_3_modified" {
+        verifyEscape @"a\\\b ""de fg"" h" [@"a\\\b" ;"de fg" ;"h"]
+    }
+
+    test "Microsoft_sample_4" {
+        verifyEscape @"a\\\""b c d" [@"a\""b" ;"c" ;"d"]
+    }
+
+    test "Microsoft_sample_5_modified" {
+        verifyEscape @"""a\\b c"" d e" [@"a\\b c" ;"d" ;"e"]
     }
 
     test "Pass_empty_arguments" {
@@ -108,7 +120,7 @@ let parseTests = [
     }
 
     test "Microsoft_sample_3" {
-        verifyParse @"a\\\b d""e f""g h" ["a\\\\\\b" ;"de fg" ;"h"]
+        verifyParse @"a\\\b d""e f""g h" [@"a\\\b" ;"de fg" ;"h"]
     }
 
     test "Microsoft_sample_4" {

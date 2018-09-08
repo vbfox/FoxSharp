@@ -8,10 +8,11 @@ let private addBackslashes (builder: StringBuilder) (backslashes: int) (beforeQu
     if backslashes <> 0 then
         // Always using 'backslashes * 2' would work it would just produce needless '\'
         let count =
-            if beforeQuote || backslashes % 2 = 0 then
-                backslashes * 2
+            if not beforeQuote then
+                // backslashes not followed immediately by a double quotation mark are interpreted literally
+                backslashes
             else
-                (backslashes-1) * 2 + 1
+                backslashes * 2
 
         for _ in [0..count-1] do
             builder.Append('\\') |> ignore
