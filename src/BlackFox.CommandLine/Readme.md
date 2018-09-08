@@ -1,5 +1,7 @@
 # Command line
 
+![Command prompt Logo](https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.CommandLine/Icon.png)
+
 [![Nuget Package](https://img.shields.io/nuget/v/BlackFox.CommandLine.svg)](https://www.nuget.org/packages/BlackFox.CommandLine)
 
 Generate, parse and escape command lines.
@@ -28,3 +30,8 @@ The `CmdLine` record and module implement a simple, pipable API to generate comm
 * `fromSeq: seq<string> -> CmdLine`: Create a command line from a sequence of arguments
 
 [MsvcrtParsing]: http://www.daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
+
+## Thanks
+
+* [Newaita icon pack](https://github.com/cbrnix/Newaita) for the base of the icon (License: [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/))
+* [@matthid](https://github.com/matthid) for [finding a bug](https://github.com/vbfox/FoxSharp/issues/1) when comparing this implementation to the one in FAKE 5
