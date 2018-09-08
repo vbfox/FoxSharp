@@ -168,4 +168,4 @@ let propertyBasedTests =
             let input = x |> List.map (fun (NonNull s) -> s)
             let escaped = MsvcrCommandLine.escape input
             let backAgain = MsvcrCommandLine.parse escaped
-            Expect.equal "First Name should not be null" input backAgain
+            Expect.equal "Input and escaped/parsed should equal" input backAgain
