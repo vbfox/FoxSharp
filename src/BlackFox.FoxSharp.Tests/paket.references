@@ -1,4 +1,5 @@
 FSharp.Core
 Expecto
 Expecto.FsCheck
+Expecto.TestResults
 FsCheck

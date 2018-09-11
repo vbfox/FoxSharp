@@ -106,15 +106,22 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "Test" [buildTests] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
+        let net461Dir = baseTestDir </> "net461"
+        let netcoreappDir = baseTestDir </> "netcoreapp2.0"
         [
-            baseTestDir </> "net461" </> (testProjectName + ".exe")
-            baseTestDir </> "netcoreapp2.0" </> (testProjectName + ".dll")
+            net461Dir </> (testProjectName + ".exe")
+            netcoreappDir </> (testProjectName + ".dll")
         ]
             |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
                     FailOnFocusedTests = true
                 })
+        (net461Dir </> "TestResults.xml") |> Shell.rename (net461Dir </> "TestResults_net461.xml")
+        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (net461Dir </> "TestResults_net461.xml")
+
+        (netcoreappDir </> "TestResults.xml") |> Shell.rename (netcoreappDir </> "TestResults_netcoreapp2_0.xml")
+        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (netcoreappDir </> "TestResults_netcoreapp2_0.xml")
     }
 
     let nuget = BuildTask.create "NuGet" [build] {
