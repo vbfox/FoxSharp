@@ -75,48 +75,48 @@ type TaskBuilder(metadata: TaskMetadata) =
         infoFromMeta metadata
 
 /// Define a Task with it's dependencies
-let createFn name dependencies body =
+let createFn (name: string) (dependencies: TaskInfo list) (body: TargetParameter -> unit): TaskInfo =
     let metadata = {Name = name; Dependencies = dependencies }
     registerTask metadata body
     infoFromMeta metadata
 
 /// Define a Task with it's dependencies
-let create (name: string) (dependencies: TaskInfo list) =
+let create (name: string) (dependencies: TaskInfo list): TaskBuilder =
     let metadata = {Name = name; Dependencies = dependencies }
     TaskBuilder(metadata)
 
 /// Define a Task without any body, only dependencies
-let createEmpty (name: string) (dependencies: TaskInfo list) =
+let createEmpty (name: string) (dependencies: TaskInfo list): TaskInfo =
     let metadata = {Name = name; Dependencies = dependencies }
     registerTask metadata ignore
     infoFromMeta metadata
 
 /// Run the task specified on the command line if there was one or the
 /// default one otherwise.
-let runOrDefault (defaultTask: TaskInfo) =
+let runOrDefault (defaultTask: TaskInfo): unit =
     match defaultTask.Metadata with
     | Some metadata -> Target.runOrDefault metadata.Name
     | None -> failwith "No default task specified."
 
 /// Run the task specified on the command line if there was one or the
 /// default one otherwise.
-let runOrDefaultWithArguments (defaultTask: TaskInfo) =
+let runOrDefaultWithArguments (defaultTask: TaskInfo): unit =
     match defaultTask.Metadata with
     | Some metadata -> Target.runOrDefaultWithArguments metadata.Name
     | None -> failwith "No default task specified."
 
 /// Runs the task given by the target parameter or lists the available targets
-let runOrList () =
+let runOrList (): unit =
     Target.runOrList ()
 
 /// List all tasks available.
-let listAvailable () =
+let listAvailable (): unit =
     Target.listAvailable ()
 
 /// <summary>Writes a dependency graph.</summary>
 /// <param name="verbose">Whether to print verbose output or not.</param>
 /// <param name="target">The target for which the dependencies should be printed.</param>
-let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo) =
+let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo): unit =
     match taskInfo.Metadata with
     | Some metadata ->
         Target.printDependencyGraph verbose metadata.Name
@@ -132,7 +132,7 @@ let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo) =
 ///
 ///  * `foo` -> `run --target foo`
 ///  * `--target bar --baz` -> `run --target bar --baz`
-let setupContextFromArgv (argv: string []) =
+let setupContextFromArgv (argv: string []): unit =
     let argvTweaked =
         match List.ofArray argv with
         | firstArg :: rest when not (firstArg.StartsWith("-")) ->
@@ -140,3 +140,29 @@ let setupContextFromArgv (argv: string []) =
         | argv -> argv
     let execContext = Context.FakeExecutionContext.Create false "build.fsx" argvTweaked
     Context.setExecutionContext (Fake.Core.Context.RuntimeContext.Fake execContext)
+
+let private temporaryColor (color: ConsoleColor) : IDisposable =
+    let colorBefore = Console.ForegroundColor
+    Console.ForegroundColor <- color
+    { new IDisposable with member __.Dispose() = Console.ForegroundColor <- colorBefore }
+
+let private appWrap (app: unit -> unit): int =
+    try
+        app ()
+        0
+    with
+    | ex ->
+        use __ = temporaryColor ConsoleColor.Red
+        printfn "%O" ex
+        1
+
+/// Run the task specified on the command line if there was one or the
+/// default one otherwise. Return 0 on success and 1 on error, printing
+/// the exception on the console.
+let runOrDefaultApp (defaultTask: TaskInfo): int =
+    appWrap (fun _ -> runOrDefault defaultTask)
+
+/// Runs the task given by the target parameter or lists the available targets.
+/// Return 0 on success and 1 on error, printing the exception on the console.
+let runOrListApp (): int =
+    appWrap (fun _ -> runOrList ())
