@@ -7,8 +7,7 @@ open Fake.BuildServer
 [<EntryPoint>]
 let main argv =
     BuildTask.setupContextFromArgv argv
-    BuildServer.install [ AppVeyor.Installer ]
+    BuildServer.install [ TeamFoundation.Installer ]
 
     let defaultTask = Tasks.createAndGetDefault ()
-    BuildTask.runOrDefault defaultTask
-    0
+    BuildTask.runOrDefaultApp defaultTask

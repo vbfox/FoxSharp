@@ -16,6 +16,6 @@
     Fake.DotNet.AssemblyInfoFile
     Fake.DotNet.Testing.Expecto
     Fake.DotNet.Paket
-    Fake.BuildServer.AppVeyor
+    Fake.BuildServer.TeamFoundation
     Fake.Api.GitHub
 

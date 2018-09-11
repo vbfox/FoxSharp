@@ -2,6 +2,4 @@
 
 ./paket.sh restore || { exit $?; }
 
-pushd src/BlackFox.FoxSharp.Build/
-dotnet run $@
-popd
+dotnet run --project src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj -- $@

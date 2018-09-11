@@ -28,19 +28,16 @@ let createAndGetDefault () =
     let configuration = DotNet.BuildConfiguration.fromEnvironVarOrDefault "configuration" DotNet.BuildConfiguration.Release
 
     let inline versionPartOrZero x = if x < 0 then 0 else x
+
+    let getUnionCaseName (x:'a) =
+        match Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(x, typeof<'a>) with | case, _ -> case.Name
+
     let getReleaseNotes (projectName: string) =
         let fromFile = ReleaseNotes.load (srcDir </> projectName </> "Release Notes.md")
         if BuildServer.buildServer <> BuildServer.LocalBuild then
-            let buildVersion = int BuildServer.buildVersion
-            let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion buildVersion
-            let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
-            let asmVer =
-                System.Version(
-                    versionPartOrZero asmVer.Major,
-                    versionPartOrZero asmVer.Minor,
-                    versionPartOrZero asmVer.Build,
-                    versionPartOrZero buildVersion)
-            ReleaseNotes.ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
+            let buildServerName = (getUnionCaseName BuildServer.buildServer).ToLowerInvariant()
+            let nugetVer = sprintf "%s-%s.%s" fromFile.NugetVersion buildServerName BuildServer.buildVersion
+            ReleaseNotes.ReleaseNotes.New(fromFile.AssemblyVersion, nugetVer, fromFile.Date, fromFile.Notes)
         else
             fromFile
 
