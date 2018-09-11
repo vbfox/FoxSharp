@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ArtifactsDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)/../artifacts/'))</ArtifactsDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.Stidgen.Build'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.FoxSharp.Build'">
     <OutputPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/'))</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
@@ -14,6 +14,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>FS2003</WarningsNotAsErrors>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
