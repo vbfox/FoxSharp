@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net46;$(TargetFrameworks)</TargetFrameworks>
     <Description>Typed `Target` for FAKE 5</Description>
     <PackageTags>build;FAKE</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.Fake.BuildTask/Icon.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />

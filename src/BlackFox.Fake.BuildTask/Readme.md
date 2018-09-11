@@ -1,5 +1,7 @@
 # FAKE BuildTask
 
+![Orange FAKE Logo](https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.Fake.BuildTask/Icon.png)
+
 A strongly typed `Target` alternative for [FAKE](https://fake.build/)
 
 [![Nuget Package](https://img.shields.io/nuget/v/BlackFox.Fake.BuildTask.svg)](https://www.nuget.org/packages/BlackFox.Fake.BuildTask)
