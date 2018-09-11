@@ -1,3 +1,9 @@
+### New in 0.1.3
+
+* Add `runOrDefaultApp` and `runOrListApp` to use FAKE directly with `dotnet run` and still print the exception nicely
+  colored and return a stable error code.
+* Add an icon (orange version of FAKE one)
+
 ### New in 0.1.2
 
 * Change `BuildTask.setupContextFromArgv` to take an array instead of a list
