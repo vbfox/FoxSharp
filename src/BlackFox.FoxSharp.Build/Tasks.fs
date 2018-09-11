@@ -106,22 +106,27 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "Test" [buildTests] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
-        let net461Dir = baseTestDir </> "net461"
-        let netcoreappDir = baseTestDir </> "netcoreapp2.0"
-        [
-            net461Dir </> (testProjectName + ".exe")
-            netcoreappDir </> (testProjectName + ".dll")
-        ]
-            |> Expecto.run (fun p ->
-                { p with
-                    PrintVersion = false
-                    FailOnFocusedTests = true
-                })
-        (net461Dir </> "TestResults.xml") |> Shell.rename (net461Dir </> "TestResults_net461.xml")
-        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (net461Dir </> "TestResults_net461.xml")
+        let testConfs = ["netcoreapp2.0", ".dll"]
+        let testConfs =
+            if Environment.isWindows then
+                ("net461", ".exe") :: testConfs
+            else
+                testConfs
 
-        (netcoreappDir </> "TestResults.xml") |> Shell.rename (netcoreappDir </> "TestResults_netcoreapp2_0.xml")
-        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (netcoreappDir </> "TestResults_netcoreapp2_0.xml")
+        testConfs
+        |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))
+        |> Expecto.run (fun p ->
+            { p with
+                PrintVersion = false
+                FailOnFocusedTests = true
+            })
+
+        for (fw, _) in testConfs do
+            let dir = baseTestDir </> fw
+            let outFile = sprintf "TestResults_%s.xml" (fw.Replace('.', '_'))
+            File.delete (dir </> outFile)
+            (dir </> "TestResults.xml") |> Shell.rename (dir </> outFile)
+            Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (dir </> outFile)
     }
 
     let nuget = BuildTask.create "NuGet" [build] {
