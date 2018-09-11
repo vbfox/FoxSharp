@@ -7,7 +7,7 @@ jobs:
     displayName: .NET first run experience
   - script: ./paket.sh restore
     displayName: Restore packages
-  - script: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
+  - script: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
     displayName: Compile build script
   - script: ./build.sh CI
     displayName: Build
@@ -19,7 +19,7 @@ jobs:
     displayName: .NET first run experience
   - script: paket.exe restore
     displayName: Restore packages
-  - script: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
+  - script: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
     displayName: Compile build script
   - script: build.cmd CI
     displayName: Build
