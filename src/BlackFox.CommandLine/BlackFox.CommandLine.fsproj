@@ -5,6 +5,7 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;$(TargetFrameworks)</TargetFrameworks>
     <Description>Parse and escape command lines</Description>
     <PackageTags>FSharp;CommandLine</PackageTags>
+    <PackageProjectUrl>https://github.com/vbfox/FoxSharp/tree/master/src/BlackFox.CommandLine</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.CommandLine/Icon.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>

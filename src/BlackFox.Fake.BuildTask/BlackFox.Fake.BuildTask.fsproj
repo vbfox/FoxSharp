@@ -5,6 +5,7 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net46;$(TargetFrameworks)</TargetFrameworks>
     <Description>Typed `Target` for FAKE 5</Description>
     <PackageTags>build;FAKE</PackageTags>
+    <PackageProjectUrl>https://github.com/vbfox/FoxSharp/tree/master/src/BlackFox.Fake.BuildTask</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.Fake.BuildTask/Icon.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
