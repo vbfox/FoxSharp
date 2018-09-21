@@ -11,6 +11,7 @@ type CmdLine = {
 module CmdLine =
     open System
     open System.Text
+    open Printf
 
     let empty = { Args = List.empty }
 
