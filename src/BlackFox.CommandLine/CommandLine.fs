@@ -33,6 +33,9 @@ module CmdLine =
 
         { cmdLine with Args = Normal(s) :: cmdLine.Args }
 
+    let appendf<'T> (format: StringFormat<'T, CmdLine -> CmdLine>): 'T =
+        ksprintf append format
+
     let appendSeq (values: 'a seq) (cmdLine : CmdLine) =
         values |> Seq.fold (fun state o -> append o state) cmdLine
 
