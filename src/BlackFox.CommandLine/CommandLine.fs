@@ -177,12 +177,14 @@ type CmdLine = {
     //-----------------------------------------------------------------------
     // To
 
+    /// Get a list of arguments from a command line (No escaping is applied)
     member this.ToList (): string list =
         let mutable result = []
         for arg in this.Args do
             result <- (arg.ToString()) :: result
         result
 
+    /// Get an array of arguments from a command line (No escaping is applied)
     member this.ToArray (): string [] =
         let mutable result = Array.zeroCreate this.Args.Length
         let mutable i = this.Args.Length - 1
@@ -201,9 +203,13 @@ type CmdLine = {
 
         builder.ToString()
 
+    /// Convert a command line to string using the MSVCRT (Windows default) rules
     member this.ToStringForMsvcr (): string =
         this.Escape (MsvcrCommandLine.escapeArg)
 
+    /// <summary>
+    /// Convert a command line to string as expected by <see cref="System.Diagnostics.Process" />
+    /// </summary>
     override this.ToString (): string =
         this.Escape (MsvcrCommandLine.escapeArg)
 
@@ -349,33 +355,42 @@ module CmdLine =
     //-----------------------------------------------------------------------
     // From
 
+    /// Create a command line from a sequence of arguments
     [<CompiledName("FromSeq")>]
-    let fromSeq (values : string seq) =
+    let inline fromSeq (values : string seq) =
         CmdLine.FromSeq values
 
+    /// Create a command line from a list of arguments
     [<CompiledName("FromList")>]
-    let fromList (values : string list) =
+    let inline fromList (values : string list) =
         CmdLine.FromList values
 
+    /// Create a command line from an array of arguments
     [<CompiledName("FromArray")>]
-    let fromArray (values : string []) =
+    let inline fromArray (values : string []) =
         CmdLine.FromArray values
 
     //-----------------------------------------------------------------------
     // To
 
+    /// Get a list of arguments from a command line (No escaping is applied)
     [<CompiledName("ToList")>]
-    let toList (cmdLine : CmdLine): string list =
+    let inline toList (cmdLine : CmdLine): string list =
         cmdLine.ToList()
 
+    /// Get an array of arguments from a command line (No escaping is applied)
     [<CompiledName("ToArray")>]
-    let toArray (cmdLine : CmdLine): string [] =
+    let inline toArray (cmdLine : CmdLine): string [] =
         cmdLine.ToArray()
 
+    /// Convert a command line to string using the MSVCRT (Windows default) rules
     [<CompiledName("ToStringForMsvcr")>]
-    let toStringForMsvcr (cmdLine : CmdLine): string =
+    let inline toStringForMsvcr (cmdLine : CmdLine): string =
         cmdLine.ToStringForMsvcr()
 
+    /// <summary>
+    /// Convert a command line to string as expected by <see cref="System.Diagnostics.Process" />
+    /// </summary>
     [<CompiledName("ToString")>]
-    let toString (cmdLine : CmdLine): string =
+    let inline toString (cmdLine : CmdLine): string =
         cmdLine.ToString()
