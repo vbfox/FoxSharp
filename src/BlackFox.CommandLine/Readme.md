@@ -346,7 +346,7 @@ Convert a command line to string as expected by `System.Diagnostics.Process`.
 
 The `MsvcrCommandLine` module is specific to the way the [Microsoft C Runtime algorithm][MsvcrtParsing] works on Windows. It's how the vast majority of arguments are parsed on the Windows platform.
 
-### EscapeSettings
+#### EscapeSettings
 
 Record type of settings for `escape`:
 
