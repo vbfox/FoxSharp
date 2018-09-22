@@ -22,9 +22,10 @@ let cmd =
     |> CmdLine.appendIf noRestore "--no-restore"
     |> CmdLine.appendPrefixIfSome "--framework" framework
     |> CmdLine.appendPrefixf "--configuration" "%A" configuration
+    |> CmdLine.toString
 
 // dotnet build --no-restore --framework netstandard2.0 --configuration Release
-printfn "dotnet %O" cmd
+printfn "dotnet %s" cmd
 ```
 
 ### CmdLine
@@ -333,9 +334,9 @@ CmdLine.empty
 |> CmdLine.toArray // [|"foo bar"; "baz"|]
 ```
 
-#### toStringForMsvcr `CmdLine -> string`
+#### toStringForMsvcr `MsvcrCommandLine.EscapeSettings -> CmdLine -> string`
 
-Convert a command line to string using the [Microsoft C Runtime][MsvcrtParsing] (Windows default) rules
+Convert a command line to string using the [Microsoft C Runtime][MsvcrtParsing] (Windows default) rules.
 
 #### toString `CmdLine -> string`
 
@@ -345,7 +346,16 @@ Convert a command line to string as expected by `System.Diagnostics.Process`.
 
 The `MsvcrCommandLine` module is specific to the way the [Microsoft C Runtime algorithm][MsvcrtParsing] works on Windows. It's how the vast majority of arguments are parsed on the Windows platform.
 
-#### escape `seq<string> -> string`
+### EscapeSettings
+
+Record type of settings for `escape`:
+
+* `AlwaysQuoteArguments: bool`: Specify that arguments should always be quoted, even simple values
+* `DoubleQuoteEscapeQuote`: Use `""` to escape a quote, otherwise `\"` is used
+    * Forces all arguments containing quotes to be surrounded by quotes
+    * This isn't compatible with pre-2008 msvcrt
+
+#### escape `EscapeSettings -> seq<string> -> string`
 
 Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand.
 

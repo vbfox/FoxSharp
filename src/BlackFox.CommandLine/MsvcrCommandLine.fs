@@ -9,8 +9,11 @@ type EscapeSettings = {
     /// Specify that arguments should always be quoted, even simple values
     AlwaysQuoteArguments: bool
 
-    /// Use quote+quote to escape a quote, otherwise backslash+quote is used (And the argument is always quoted)
-    /// This isn't compatible with pre-2008 msvcrt
+    /// Use `""` to escape a quote, otherwise `\"` is used
+    /// Notes:
+    ///
+    /// * Forces all arguments containing quotes to be surrounded by quotes
+    /// * This isn't compatible with pre-2008 msvcrt
     DoubleQuoteEscapeQuote: bool }
 
 /// Default escape settings
