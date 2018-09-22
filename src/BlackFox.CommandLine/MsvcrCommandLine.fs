@@ -6,12 +6,17 @@ open System.Text
 
 /// Settings for the escape method
 type EscapeSettings = {
+    /// Specify that arguments should always be quoted, even simple values
+    AlwaysQuoteArguments: bool
+
     /// Use quote+quote to escape a quote, otherwise backslash+quote is used (And the argument is always quoted)
     /// This isn't compatible with pre-2008 msvcrt
-    DoubleQuoteEscape: bool }
+    DoubleQuoteEscapeQuote: bool }
 
 /// Default escape settings
-let defaultEscapeSettings = { DoubleQuoteEscape = false }
+let defaultEscapeSettings = {
+    AlwaysQuoteArguments = false
+    DoubleQuoteEscapeQuote = false }
 
 let private addBackslashes (builder: StringBuilder) (backslashes: int) (beforeQuote: bool) =
     if backslashes <> 0 then
@@ -38,7 +43,7 @@ let private escapeArgCore (settings: EscapeSettings) (arg : string) (builder : S
                 escape (pos+1) (backslashes+1)
             | '"' ->
                 addBackslashes builder backslashes true
-                if settings.DoubleQuoteEscape then
+                if settings.DoubleQuoteEscapeQuote then
                     builder.Append("\"\"") |> ignore
                 else
                     builder.Append("\\\"") |> ignore
@@ -57,18 +62,19 @@ let internal escapeArg (settings: EscapeSettings) (arg : string) (builder : Stri
         // Empty arg
         builder.Append(@"""""") |> ignore
     else
-        let mutable needQuote = false
+        let mutable needQuote = settings.AlwaysQuoteArguments
         let mutable containsQuoteOrBackslash = false
 
-        for c in arg do
-            needQuote <- needQuote || (c = ' ')
-            needQuote <- needQuote || (c = '\t')
-            if settings.DoubleQuoteEscape then
-                // Double quote escaping can only work inside quoted blocks
-                // (Also it's specific to post-2008 msvcrt)
-                needQuote <- needQuote || (c = '"')
-            containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '"')
-            containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '\\')
+        if not settings.AlwaysQuoteArguments then
+            for c in arg do
+                needQuote <- needQuote || (c = ' ')
+                needQuote <- needQuote || (c = '\t')
+                if settings.DoubleQuoteEscapeQuote then
+                    // Double quote escaping can only work inside quoted blocks
+                    // (Also it's specific to post-2008 msvcrt)
+                    needQuote <- needQuote || (c = '"')
+                containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '"')
+                containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '\\')
 
         if (not containsQuoteOrBackslash) && (not needQuote) then
             // No special characters are present, early exit

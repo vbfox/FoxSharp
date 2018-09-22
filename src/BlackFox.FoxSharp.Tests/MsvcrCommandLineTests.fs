@@ -163,19 +163,13 @@ open FsCheck
 
 [<Tests>]
 let propertyBasedTests =
-    testList "Property based" [
-        testProperty "Escape is the inverse of Parse" <|
-            fun (x: NonNull<string> list) ->
-                let input = x |> List.map (fun (NonNull s) -> s)
-                let escaped = MsvcrCommandLine.escape MsvcrCommandLine.defaultEscapeSettings input
-                let backAgain = MsvcrCommandLine.parse escaped
-                Expect.equal "Input and escaped/parsed should equal" input backAgain
-
-        testProperty "Escape is the inverse of Parse with double quotes" <|
-            fun (x: NonNull<string> list) ->
-                let input = x |> List.map (fun (NonNull s) -> s)
-                let escaped = MsvcrCommandLine.escape { MsvcrCommandLine.DoubleQuoteEscape = true } input
-                let backAgain = MsvcrCommandLine.parse escaped
-                Expect.equal "Input and escaped/parsed should equal" input backAgain
-    ]
-
+    testProperty "Escape is the inverse of Parse" <|
+        fun (x: NonNull<string> list) (alwaysQuoteArguments: bool) (doubleQuoteEscapeQuote: bool) ->
+            let input = x |> List.map (fun (NonNull s) -> s)
+            let settings =
+                { MsvcrCommandLine.defaultEscapeSettings with
+                    AlwaysQuoteArguments = alwaysQuoteArguments
+                    DoubleQuoteEscapeQuote = doubleQuoteEscapeQuote}
+            let escaped = MsvcrCommandLine.escape settings input
+            let backAgain = MsvcrCommandLine.parse escaped
+            Expect.equal "Input and escaped/parsed should equal" input backAgain

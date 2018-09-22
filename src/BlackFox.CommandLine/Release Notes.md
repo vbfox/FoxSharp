@@ -1,7 +1,8 @@
 ### New in 0.5.1
 
-* MSVCRT methods now accept a settings record
-* Added setting to use double quote escaping of quotes instead of backslash
+* Msvcr: Methods now accept a settings record
+* Msvcr: Added setting to use double quote escaping of quotes instead of backslash
+* Msvcr: Added setting to always quote arguments
 
 ### New in 0.5.0
 
