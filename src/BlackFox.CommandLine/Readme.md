@@ -27,18 +27,6 @@ let cmd =
 printfn "dotnet %O" cmd
 ```
 
-### MsvcrCommandLine
-
-The `MsvcrCommandLine` module is specific to the way the [Microsoft C Runtime algorithm][MsvcrtParsing] works on Windows. It's how the vast majority of arguments are parsed on the Windows platform.
-
-#### escape `seq<string> -> string`
-
-Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand.
-
-#### parse `string -> string list`
-
-Parse a string representing arguments as the Microsoft C Runtime does.
-
 ### CmdLine
 
 The `CmdLine` record and module implement a simple, pipable API to generate command lines.
@@ -352,6 +340,18 @@ Convert a command line to string using the [Microsoft C Runtime][MsvcrtParsing] 
 #### toString `CmdLine -> string`
 
 Convert a command line to string as expected by `System.Diagnostics.Process`.
+
+### MsvcrCommandLine
+
+The `MsvcrCommandLine` module is specific to the way the [Microsoft C Runtime algorithm][MsvcrtParsing] works on Windows. It's how the vast majority of arguments are parsed on the Windows platform.
+
+#### escape `seq<string> -> string`
+
+Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand.
+
+#### parse `string -> string list`
+
+Parse a string representing arguments as the Microsoft C Runtime does.
 
 [MsvcrtParsing]: http://www.daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
 
