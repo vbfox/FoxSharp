@@ -4,6 +4,15 @@ module BlackFox.CommandLine.MsvcrCommandLine
 
 open System.Text
 
+/// Settings for the escape method
+type EscapeSettings = {
+    /// Use quote+quote to escape a quote, otherwise backslash+quote is used (And the argument is always quoted)
+    /// This isn't compatible with pre-2008 msvcrt
+    DoubleQuoteEscape: bool }
+
+/// Default escape settings
+let defaultEscapeSettings = { DoubleQuoteEscape = false }
+
 let private addBackslashes (builder: StringBuilder) (backslashes: int) (beforeQuote: bool) =
     if backslashes <> 0 then
         // Always using 'backslashes * 2' would work it would just produce needless '\'
@@ -17,7 +26,7 @@ let private addBackslashes (builder: StringBuilder) (backslashes: int) (beforeQu
         for _ in [0..count-1] do
             builder.Append('\\') |> ignore
 
-let private escapeArgCore (arg : string) (builder : StringBuilder) needQuote =
+let private escapeArgCore (settings: EscapeSettings) (arg : string) (builder : StringBuilder) needQuote =
     let rec escape pos backslashes =
         if pos >= arg.Length then
             addBackslashes builder backslashes needQuote
@@ -29,8 +38,10 @@ let private escapeArgCore (arg : string) (builder : StringBuilder) needQuote =
                 escape (pos+1) (backslashes+1)
             | '"' ->
                 addBackslashes builder backslashes true
-                builder.Append('\\') |> ignore
-                builder.Append(c) |> ignore
+                if settings.DoubleQuoteEscape then
+                    builder.Append("\"\"") |> ignore
+                else
+                    builder.Append("\\\"") |> ignore
                 escape (pos+1) 0
             | _ ->
                 addBackslashes builder backslashes false
@@ -39,7 +50,7 @@ let private escapeArgCore (arg : string) (builder : StringBuilder) needQuote =
 
     escape 0 0
 
-let internal escapeArg (arg : string) (builder : StringBuilder) =
+let internal escapeArg (settings: EscapeSettings) (arg : string) (builder : StringBuilder) =
     builder.EnsureCapacity(arg.Length + builder.Length) |> ignore
 
     if arg.Length = 0 then
@@ -52,6 +63,10 @@ let internal escapeArg (arg : string) (builder : StringBuilder) =
         for c in arg do
             needQuote <- needQuote || (c = ' ')
             needQuote <- needQuote || (c = '\t')
+            if settings.DoubleQuoteEscape then
+                // Double quote escaping can only work inside quoted blocks
+                // (Also it's specific to post-2008 msvcrt)
+                needQuote <- needQuote || (c = '"')
             containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '"')
             containsQuoteOrBackslash <- containsQuoteOrBackslash || (c = '\\')
 
@@ -61,14 +76,14 @@ let internal escapeArg (arg : string) (builder : StringBuilder) =
         else
             // Complex case, we really need to escape
             if needQuote then builder.Append('"') |> ignore
-            escapeArgCore arg builder needQuote
+            escapeArgCore settings arg builder needQuote
             if needQuote then builder.Append('"') |> ignore
 
-let escape cmdLine =
+let escape (settings: EscapeSettings) cmdLine =
     let builder = StringBuilder()
     cmdLine |> Seq.iteri (fun i arg ->
         if (i <> 0) then builder.Append(' ') |> ignore
-        escapeArg arg builder)
+        escapeArg settings arg builder)
 
     builder.ToString()
 

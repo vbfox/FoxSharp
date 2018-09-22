@@ -1,3 +1,8 @@
+### New in 0.5.1
+
+* MSVCRT methods now accept a settings record
+* Added setting to use double quote escaping of quotes instead of backslash
+
 ### New in 0.5.0
 
 * Changed a big part of the `CmdLine` API, now with a lot more variants including prefixes and printf-style versions.

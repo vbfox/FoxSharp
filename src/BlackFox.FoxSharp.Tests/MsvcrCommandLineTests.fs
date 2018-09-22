@@ -5,7 +5,7 @@ open Expecto.Flip
 open BlackFox.CommandLine
 
 let verifyEscape expected argv =
-    let result = MsvcrCommandLine.escape argv
+    let result = MsvcrCommandLine.escape MsvcrCommandLine.defaultEscapeSettings argv
     Expect.equal (sprintf "%A" argv) expected result
 
 let escapeTests = [
@@ -163,9 +163,19 @@ open FsCheck
 
 [<Tests>]
 let propertyBasedTests =
-    testProperty "Escape is the inverse of Parse" <|
-        fun (x: NonNull<string> list) ->
-            let input = x |> List.map (fun (NonNull s) -> s)
-            let escaped = MsvcrCommandLine.escape input
-            let backAgain = MsvcrCommandLine.parse escaped
-            Expect.equal "Input and escaped/parsed should equal" input backAgain
+    testList "Property based" [
+        testProperty "Escape is the inverse of Parse" <|
+            fun (x: NonNull<string> list) ->
+                let input = x |> List.map (fun (NonNull s) -> s)
+                let escaped = MsvcrCommandLine.escape MsvcrCommandLine.defaultEscapeSettings input
+                let backAgain = MsvcrCommandLine.parse escaped
+                Expect.equal "Input and escaped/parsed should equal" input backAgain
+
+        testProperty "Escape is the inverse of Parse with double quotes" <|
+            fun (x: NonNull<string> list) ->
+                let input = x |> List.map (fun (NonNull s) -> s)
+                let escaped = MsvcrCommandLine.escape { MsvcrCommandLine.DoubleQuoteEscape = true } input
+                let backAgain = MsvcrCommandLine.parse escaped
+                Expect.equal "Input and escaped/parsed should equal" input backAgain
+    ]
+

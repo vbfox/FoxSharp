@@ -204,14 +204,14 @@ type CmdLine = {
         builder.ToString()
 
     /// Convert a command line to string using the MSVCRT (Windows default) rules
-    member this.ToStringForMsvcr (): string =
-        this.Escape (MsvcrCommandLine.escapeArg)
+    member this.ToStringForMsvcr (settings: MsvcrCommandLine.EscapeSettings): string =
+        this.Escape (MsvcrCommandLine.escapeArg settings)
 
     /// <summary>
     /// Convert a command line to string as expected by <see cref="System.Diagnostics.Process" />
     /// </summary>
     override this.ToString (): string =
-        this.Escape (MsvcrCommandLine.escapeArg)
+        this.ToStringForMsvcr MsvcrCommandLine.defaultEscapeSettings
 
 /// Handle command line arguments
 module CmdLine =
@@ -385,8 +385,8 @@ module CmdLine =
 
     /// Convert a command line to string using the MSVCRT (Windows default) rules
     [<CompiledName("ToStringForMsvcr")>]
-    let inline toStringForMsvcr (cmdLine : CmdLine): string =
-        cmdLine.ToStringForMsvcr()
+    let inline toStringForMsvcr (settings: MsvcrCommandLine.EscapeSettings) (cmdLine : CmdLine): string =
+        cmdLine.ToStringForMsvcr(settings)
 
     /// <summary>
     /// Convert a command line to string as expected by <see cref="System.Diagnostics.Process" />
