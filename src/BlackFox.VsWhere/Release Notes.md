@@ -1,3 +1,8 @@
+### New in 0.3.2
+
+* Harden against null values in COM API. Fixes [#5](https://github.com/vbfox/FoxSharp/issues/5)
+* Ignore instances that fail to be parsed (An error is logged to `System.Diagnostics.Trace`)
+
 ### New in 0.3.1
 
 * Fix a bug in VsSetupPackage Version (The value was the ID instead of the version)

@@ -1,7 +1,14 @@
 module BlackFox.VsWhere.VsInstances
 
 open System
+open System.Diagnostics
 open System.Runtime.InteropServices
+
+let inline private emptySeqIfNull (s: _ seq) =
+    if isNull s then
+        Seq.empty
+    else
+        s
 
 let private setupConfiguration = lazy(
     let configType = System.Type.GetTypeFromCLSID (System.Guid "177F0C4A-1CD3-4DE7-A32C-71DBBB9FA36D")
@@ -24,11 +31,15 @@ let private enumAllInstances () =
     }
 
 let private parseErrorInfo (error: ISetupErrorInfo) =
-    {
-        HResult = error.GetErrorHResult()
-        ErrorClassName = error.GetErrorClassName()
-        ErrorMessage = error.GetErrorMessage()
-    }
+    if isNull error then
+        None
+    else
+        {
+            HResult = error.GetErrorHResult()
+            ErrorClassName = error.GetErrorClassName()
+            ErrorMessage = error.GetErrorMessage()
+        }
+        |> Some
 
 let private parsePackageReference (instance: ISetupPackageReference) =
     {
@@ -45,8 +56,8 @@ let private parsePackageReference (instance: ISetupPackageReference) =
 let private parseErrorState (state: ISetupErrorState) =
     let result =
         {
-            FailedPackages = state.GetFailedPackages() |> Seq.map parsePackageReference |> List.ofSeq
-            SkippedPackages = state.GetSkippedPackages() |> Seq.map parsePackageReference |> List.ofSeq
+            FailedPackages = state.GetFailedPackages() |> emptySeqIfNull |> Seq.map parsePackageReference |> List.ofSeq
+            SkippedPackages = state.GetSkippedPackages() |> emptySeqIfNull |> Seq.map parsePackageReference |> List.ofSeq
             ErrorLogFilePath = None
             LogFilePath = None
             RuntimeError = None
@@ -56,13 +67,13 @@ let private parseErrorState (state: ISetupErrorState) =
     | :? ISetupErrorState2 as state2 ->
         let result2 =
             { result with
-                ErrorLogFilePath = state2.GetErrorLogFilePath() |> Some
-                LogFilePath = state2.GetLogFilePath() |> Some
+                ErrorLogFilePath = state2.GetErrorLogFilePath() |> Option.ofObj
+                LogFilePath = state2.GetLogFilePath() |> Option.ofObj
             }
         match state2 with
         | :? ISetupErrorState3 as state3 ->
             { result2 with
-                RuntimeError = state3.GetRuntimeError() |> parseErrorInfo |> Some
+                RuntimeError = state3.GetRuntimeError() |> parseErrorInfo
             }
         | _-> result2
     | _ -> result
@@ -74,11 +85,15 @@ let private parseDate (date: System.Runtime.InteropServices.ComTypes.FILETIME) =
     DateTimeOffset.FromFileTime(int64 composed)
 
 let private parseProperties (store: ISetupPropertyStore) =
-    store.GetNames()
-    |> Seq.map(fun name ->
-        let value = store.GetValue(name)
-        name, value)
-    |> Map.ofSeq
+    if isNull store then
+        Map.empty
+    else
+        store.GetNames()
+        |> emptySeqIfNull
+        |> Seq.map(fun name ->
+            let value = store.GetValue(name)
+            name, value)
+        |> Map.ofSeq
 
 let private parseInstance (instance: ISetupInstance) =
     let mutable result =
@@ -112,7 +127,7 @@ let private parseInstance (instance: ISetupInstance) =
     | :? ISetupInstance2 as v2 ->
         { result with
             State = v2.GetState() |> Some
-            Packages = v2.GetPackages() |> Seq.map parsePackageReference |> List.ofSeq
+            Packages = v2.GetPackages() |> emptySeqIfNull |> Seq.map parsePackageReference |> List.ofSeq
             Product = parsePackageReference (v2.GetProduct()) |> Some
             ProductPath = v2.GetProductPath() |> Some
             Errors = v2.GetErrors() |> Option.ofObj |> Option.map parseErrorState
@@ -121,6 +136,15 @@ let private parseInstance (instance: ISetupInstance) =
             Properties = parseProperties (v2.GetProperties())
             EnginePath = v2.GetEnginePath() |> Some }
     | _ -> result
+
+let private parseInstanceOrNone (instance: ISetupInstance) =
+    try
+        parseInstance instance
+        |> Some
+    with
+    | exn ->
+        Trace.TraceError("Failed to parse Visual Studio ISetupInstance: {0}", exn)
+        None
 
 /// <summary>
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
@@ -134,7 +158,7 @@ let getAll (): VsSetupInstance list =
     else
         try
             enumAllInstances ()
-            |> Seq.map parseInstance
+            |> Seq.choose parseInstanceOrNone
             |> List.ofSeq
         with
         | :? COMException ->
