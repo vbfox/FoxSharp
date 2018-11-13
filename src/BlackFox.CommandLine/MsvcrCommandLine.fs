@@ -62,7 +62,7 @@ let private escapeArgCore (settings: EscapeSettings) (arg : string) (builder : S
 
     escape 0 0
 
-let internal escapeArg (settings: EscapeSettings) (arg : string) (builder : StringBuilder) =
+let escapeArgumentToBuilder (settings: EscapeSettings) (arg : string) (builder : StringBuilder): unit =
     builder.EnsureCapacity(arg.Length + builder.Length) |> ignore
 
     if arg.Length = 0 then
@@ -92,12 +92,19 @@ let internal escapeArg (settings: EscapeSettings) (arg : string) (builder : Stri
             escapeArgCore settings arg builder needQuote
             if needQuote then builder.Append('"') |> ignore
 
-let escape (settings: EscapeSettings) cmdLine =
+let escapeArgument (settings: EscapeSettings) (arg : string): string =
     let builder = StringBuilder()
+    escapeArgumentToBuilder settings arg builder
+    builder.ToString()
+
+let escapeToBuilder (settings: EscapeSettings) (cmdLine: seq<string>) (builder: StringBuilder): unit =
     cmdLine |> Seq.iteri (fun i arg ->
         if (i <> 0) then builder.Append(' ') |> ignore
-        escapeArg settings arg builder)
+        escapeArgumentToBuilder settings arg builder)
 
+let escape (settings: EscapeSettings) (cmdLine: seq<string>): string =
+    let builder = StringBuilder()
+    escapeToBuilder settings cmdLine builder
     builder.ToString()
 
 let private parseBackslashes (backslashes: Ref<int>) (buffer: StringBuilder) (c: char) =

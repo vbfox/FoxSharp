@@ -3,6 +3,19 @@ namespace BlackFox.CommandLine
 open Printf
 open System.Text
 
+module private EnvironmentDetection =
+    open System
+
+    let isMono =
+        Type.GetType "Mono.Runtime" <> null
+
+    let isUnixLike =
+        match System.Environment.OSVersion.Platform with
+        | PlatformID.Unix
+        | PlatformID.MacOSX ->
+            true
+        | _ -> false
+
 /// A command line argument
 type CmdLineArgType =
     /// Normal command line argument that should be escaped
@@ -205,13 +218,20 @@ type CmdLine = {
 
     /// Convert a command line to string using the MSVCRT (Windows default) rules
     member this.ToStringForMsvcr (settings: MsvcrCommandLine.EscapeSettings): string =
-        this.Escape (MsvcrCommandLine.escapeArg settings)
+        this.Escape (MsvcrCommandLine.escapeArgumentToBuilder settings)
+
+    /// Convert a command line to string using the MSVCRT (Windows default) rules
+    member this.ToStringForMonoUnix (settings: MonoUnixCommandLine.EscapeSettings): string =
+        this.Escape (MonoUnixCommandLine.escapeArgumentToBuilder settings)
 
     /// <summary>
     /// Convert a command line to string as expected by <see cref="System.Diagnostics.Process" />
     /// </summary>
     override this.ToString (): string =
-        this.ToStringForMsvcr MsvcrCommandLine.defaultEscapeSettings
+        if EnvironmentDetection.isMono && EnvironmentDetection.isUnixLike then
+            this.ToStringForMonoUnix MonoUnixCommandLine.defaultEscapeSettings
+        else
+            this.ToStringForMsvcr MsvcrCommandLine.defaultEscapeSettings
 
 /// Handle command line arguments
 module CmdLine =

@@ -1,3 +1,10 @@
+### New in 0.6.0
+
+* Added support for Mono on Unix specific encoding of `System.Process` arguments in `MonoUnixCommandLine`.
+* Auto-detect Mono on Unix and switch to the specific implementation
+* Added methods in `MonoUnixCommandLine` and `MsvcrCommandLine` to encode a single argument if needed
+* Added tests to confirm that the current Msvcr handling work for .Net Core on Unix
+
 ### New in 0.5.1
 
 * Msvcr: Methods now accept a settings record
