@@ -152,17 +152,9 @@ let parseTests = [
     }
 ]
 
-[<Tests>]
-let test =
-    testList "msvcr" [
-        testList "escape" escapeTests
-        testList "parse" parseTests
-    ]
-
 open FsCheck
 
-[<Tests>]
-let propertyBasedTests =
+let escapeRoundtripWithParse =
     testProperty "Escape is the inverse of Parse" <|
         fun (x: NonNull<string> list) (alwaysQuoteArguments: bool) (doubleQuoteEscapeQuote: bool) ->
             let input = x |> List.map (fun (NonNull s) -> s)
@@ -173,3 +165,12 @@ let propertyBasedTests =
             let escaped = MsvcrCommandLine.escape settings input
             let backAgain = MsvcrCommandLine.parse escaped
             Expect.equal "Input and escaped/parsed should equal" input backAgain
+
+
+[<Tests>]
+let test =
+    testList "MSVCR command line" [
+        testList "escape" escapeTests
+        testList "parse" parseTests
+        testList "Property Based" [escapeRoundtripWithParse]
+    ]

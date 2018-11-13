@@ -1,6 +1,10 @@
-/// Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand
-/// Rules taken from http://www.daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
+/// Parse and escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand
 module BlackFox.CommandLine.MsvcrCommandLine
+
+// The best explanation for the rule and especially their history can be found in
+// http://www.daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
+// The current version of the behavior is also documented by microsoft at
+// https://docs.microsoft.com/en-us/windows/desktop/api/shellapi/nf-shellapi-commandlinetoargvw
 
 open System.Text
 

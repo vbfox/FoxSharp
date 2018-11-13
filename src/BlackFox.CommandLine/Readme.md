@@ -30,7 +30,7 @@ printfn "dotnet %s" cmd
 
 ### CmdLine
 
-The `CmdLine` record and module implement a simple, pipable API to generate command lines.
+The `CmdLine` record and module implement a simple, pipeable API to generate command lines.
 
 #### empty `CmdLine`
 
@@ -353,11 +353,11 @@ Record type of settings for `escape`:
 * `AlwaysQuoteArguments: bool`: Specify that arguments should always be quoted, even simple values
 * `DoubleQuoteEscapeQuote`: Use `""` to escape a quote, otherwise `\"` is used
     * Forces all arguments containing quotes to be surrounded by quotes
-    * This isn't compatible with pre-2008 msvcrt
+    * This isn't compatible with pre-2008 msvcr
 
 #### escape `EscapeSettings -> seq<string> -> string`
 
-Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfuly understand.
+Escape arguments in a form that programs parsing it as Microsoft C Runtime will successfully understand.
 
 #### parse `string -> string list`
 
