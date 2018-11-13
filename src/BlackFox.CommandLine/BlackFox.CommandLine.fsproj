@@ -15,5 +15,7 @@
   <ItemGroup>
     <Compile Include="MsvcrCommandLine.fs" />
     <Compile Include="CommandLine.fs" />
+    <Compile Include="MonoUnixCommandLine.fs" />
+    <Compile Include="DotnetCoreUnixCommandLine.fs" />
   </ItemGroup>
 </Project>
