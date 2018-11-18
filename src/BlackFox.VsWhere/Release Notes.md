@@ -1,3 +1,7 @@
+### New in 1.0.0
+
+* No changes but as FAKE is using the library the API shouldn't change now.
+
 ### New in 0.3.2
 
 * Harden against null values in COM API. Fixes [#5](https://github.com/vbfox/FoxSharp/issues/5)
