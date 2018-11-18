@@ -46,8 +46,8 @@ CmdLine.empty
 Concatenate command lines
 
 ```fsharp
-let first = CmdLine.empty |> CmdLine.append "--bar"
-let second = CmdLine.empty |> CmdLine.append "foo"
+let first = CmdLine.empty |> CmdLine.append "foo"
+let second = CmdLine.empty |> CmdLine.append "--bar"
 
 CmdLine.concat [first; second]
 |> CmdLine.toString // foo --bar
