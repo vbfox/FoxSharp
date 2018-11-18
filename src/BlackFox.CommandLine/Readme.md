@@ -41,15 +41,15 @@ CmdLine.empty
 |> CmdLine.toString // (empty string)
 ```
 
-#### concat `CmdLine -> CmdLine -> CmdLine`
+#### concat `CmdLine seq -> CmdLine`
 
-Concatenate two command lines (First the second one then the first one)
+Concatenate command lines
 
 ```fsharp
-let other = CmdLine.empty |> CmdLine.append "--bar"
-CmdLine.empty
-|> CmdLine.append "foo"
-|> CmdLine.concat other
+let first = CmdLine.empty |> CmdLine.append "--bar"
+let second = CmdLine.empty |> CmdLine.append "foo"
+
+CmdLine.concat [first; second]
 |> CmdLine.toString // foo --bar
 ```
 

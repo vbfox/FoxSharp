@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="JavaPropertiesFileTests.fs" />
+    <Compile Include="CmdLineTests.fs" />
     <Compile Include="MsvcrCommandLineTests.fs" />
     <Compile Include="MonoUnixCommandLineTests.fs" />
     <Compile Include="DotnetCoreUnixCommandLineTests.fs" />

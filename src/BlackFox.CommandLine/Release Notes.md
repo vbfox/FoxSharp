@@ -1,3 +1,7 @@
+### New in 1.0.0
+
+* Breaking change: Use the same signature for `CmdLine.concat` as the standard modules: `CmdLine seq -> CmdLine`
+
 ### New in 0.6.0
 
 * Added support for Mono on Unix specific encoding of `System.Process` arguments in `MonoUnixCommandLine`.

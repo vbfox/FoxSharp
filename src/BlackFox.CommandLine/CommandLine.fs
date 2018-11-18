@@ -40,6 +40,9 @@ type CmdLine = {
     member this.Concat (other : CmdLine): CmdLine =
         { this with Args = other.Args @ this.Args }
 
+    static member Concat(cmdLines: CmdLine seq): CmdLine =
+        { Args = List.concat (cmdLines |> Seq.rev |> Seq.map (fun c -> c.Args)) }
+
     /// Append a raw (Non escaped) argument
     member this.AppendRaw (value: string): CmdLine =
         { this with Args = Raw(value) :: this.Args }
@@ -240,10 +243,10 @@ module CmdLine =
     let empty: CmdLine =
         CmdLine.Empty
 
-    /// Concatenate two command lines (First the second one then the first one)
+    /// Concatenate command lines
     [<CompiledName("Concat")>]
-    let inline concat (other : CmdLine) (cmdLine : CmdLine): CmdLine =
-        cmdLine.Concat other
+    let inline concat (cmdLines : CmdLine seq): CmdLine =
+        CmdLine.Concat cmdLines
 
     /// Append a raw (Non escaped) argument to a command line
     [<CompiledName("AppendRaw")>]
