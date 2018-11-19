@@ -48,8 +48,6 @@ let escapeRoundtripWithParse =
 [<Tests>]
 let test =
     testList "Mono unix command line" [
-        //testList "escape" escapeTests
-        //testList "parse" parseTests
         testList "Property Based" [
             escapeRoundtripWithMono
             escapeRoundtripWithParse
