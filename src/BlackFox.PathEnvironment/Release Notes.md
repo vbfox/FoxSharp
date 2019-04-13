@@ -1,3 +1,7 @@
+### New in 0.3.0
+
+* Fix bug on windows where files without extensions were considered executable
+
 ### New in 0.2.0
 
 * Nicer API

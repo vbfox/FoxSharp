@@ -4,13 +4,23 @@ open System
 open System.IO
 
 module private PathEnvironmentUtils =
+    let private noExtensionsExecutable =
+        match Environment.OSVersion.Platform with
+        | PlatformID.Win32NT
+        | PlatformID.Win32S
+        | PlatformID.Win32Windows
+        | PlatformID.WinCE
+        | PlatformID.Xbox -> false
+        | _ -> true
+
     let findFileInDirs dirs names =
         dirs
         |> Seq.collect (fun dir -> names |> List.map (fun name -> Path.Combine(dir, name)))
         |> Seq.tryFind(File.Exists)
 
     let findProgramInDirs dirs programExts name =
-        let names = name :: (programExts |> List.map ((+) name))
+        let namesWithExt = programExts |> List.map ((+) name)
+        let names = if noExtensionsExecutable then name :: namesWithExt else namesWithExt
         findFileInDirs dirs names
 
     let envVarOrEmpty name =
