@@ -321,3 +321,4 @@ ASALocalRun/
 *.binlog
 
 TestResults.xml
+.ionide/
