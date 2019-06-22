@@ -3,6 +3,9 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
+  - task: DotNetCoreInstaller@0
+    inputs:
+      version: '2.1.401'
   - script: ./paket.sh restore
     displayName: Restore packages
     env:
@@ -22,6 +25,9 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
+  - task: DotNetCoreInstaller@0
+    inputs:
+      version: '2.1.401'
   - script: paket.exe restore
     displayName: Restore packages
     env:
