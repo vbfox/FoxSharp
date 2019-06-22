@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net46;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <Description>Typed `Target` for FAKE 5</Description>
     <PackageTags>build;FAKE</PackageTags>
     <PackageProjectUrl>https://github.com/vbfox/FoxSharp/tree/master/src/BlackFox.Fake.BuildTask</PackageProjectUrl>
@@ -11,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
     <PackageReference Include="Fake.Core.Target" Version="5.1.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />

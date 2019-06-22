@@ -3,3 +3,4 @@ Expecto
 Expecto.FsCheck
 Expecto.TestResults
 FsCheck
+Microsoft.NETFramework.ReferenceAssemblies

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <Description>Parse and escape command lines</Description>
     <PackageTags>FSharp;CommandLine</PackageTags>
     <PackageProjectUrl>https://github.com/vbfox/FoxSharp/tree/master/src/BlackFox.CommandLine</PackageProjectUrl>
@@ -11,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.0.0.1" Condition="'$(TargetFramework)' == 'net45'" />
     <PackageReference Include="FSharp.Core" Version="4.2.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MsvcrCommandLine.fs" />
