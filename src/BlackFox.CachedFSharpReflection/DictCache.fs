@@ -19,3 +19,6 @@ module private DictCache =
     let get key cache =
         let dictKey = cache.KeyConverter key
         cache.Dict.GetOrAdd(dictKey, fun _ -> cache.Getter key)
+
+    let clear cache =
+        cache.Dict.Clear()

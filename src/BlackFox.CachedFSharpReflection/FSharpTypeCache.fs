@@ -134,3 +134,16 @@ type FSharpTypeCache() =
     /// <returns>An array containing the PropertyInfo of each field in the exception.</returns>
     member __.GetExceptionFields(exceptionType: Type): PropertyInfo[] =
         getExceptionFields |> DictCache.get exceptionType
+
+    member __.Clear() =
+        DictCache.clear isFunction
+        DictCache.clear isModule
+        DictCache.clear isTuple
+        DictCache.clear isRecord
+        DictCache.clear isUnion
+        DictCache.clear isExceptionRepresentation
+        DictCache.clear getTupleElements
+        DictCache.clear getFunctionElements
+        DictCache.clear getRecordFields
+        DictCache.clear getUnionCases
+        DictCache.clear getExceptionFields
