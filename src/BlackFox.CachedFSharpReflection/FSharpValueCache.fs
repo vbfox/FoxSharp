@@ -79,6 +79,10 @@ type FSharpValueCache() =
             typeFullName
             FSharpValue.PreComputeTupleConstructorInfo
 
+    static member private lazyShared = lazy (FSharpValueCache())
+
+    static member Shared with get() = FSharpValueCache.lazyShared.Value
+
     /// <summary>Precompute a function for reading a particular field from a record.
     /// Assumes the given type is a RecordType with a field of the given name. 
     /// If not, ArgumentException is raised during pre-computation.</summary>
@@ -202,3 +206,18 @@ type FSharpValueCache() =
     /// for large tuples.</returns>
     member __.GetTupleConstructorInfo(tupleType:Type): ConstructorInfo * Type option =
         tupleConstructorInfo |> DictCache.get tupleType
+
+    member __.Clear() =
+        DictCache.clear recordFieldReader
+        DictCache.clear recordReader
+        DictCache.clear recordConstructor
+        DictCache.clear recordConstructorInfo
+        DictCache.clear unionTagReader
+        DictCache.clear unionTagMemberInfo
+        DictCache.clear unionConstructorInfo
+        DictCache.clear unionConstructor
+        DictCache.clear unionReader
+        DictCache.clear tupleReader
+        DictCache.clear tuplePropertyInfo
+        DictCache.clear tupleConstructor
+        DictCache.clear tupleConstructorInfo
