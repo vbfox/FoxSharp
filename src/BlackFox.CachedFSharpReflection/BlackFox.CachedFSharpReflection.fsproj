@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Readme.md" />
+    <Content Include="Release Notes.md" />
     <Compile Include="DictCache.fs" />
     <Compile Include="FSharpTypeCache.fs" />
+    <Compile Include="FSharpValueCache.fs" />
   </ItemGroup>
 
 </Project>
