@@ -4,6 +4,12 @@
 
 Cache the F# reflection API calls results for fast access
 
+## Status
+
+This library is an early preview.
+
+[Change Log](Release%20Notes.md)
+
 ## Sample
 
 ```fsharp
