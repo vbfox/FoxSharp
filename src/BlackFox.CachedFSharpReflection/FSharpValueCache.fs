@@ -5,63 +5,63 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpValueCache() =
-    let typeFullName (t: Type) =
+    let typeKey (t: Type) =
         t.FullName
 
-    let propertyFullName (p: PropertyInfo) =
-        p.DeclaringType.FullName + "." + p.Name
+    let propertyKey (p: PropertyInfo) =
+        struct(p.DeclaringType.FullName, p.Name)
 
-    let unionCaseFullName (c: UnionCaseInfo) =
-        c.DeclaringType.FullName + "." + c.Name
+    let unionCaseKey (c: UnionCaseInfo) =
+        struct(c.DeclaringType.FullName, c.Name)
 
     let recordFieldReader =
         DictCache.create
-            propertyFullName
+            propertyKey
             FSharpValue.PreComputeRecordFieldReader
 
     let recordReader =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeRecordReader
 
     let recordConstructor =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeRecordConstructor
 
     let recordConstructorInfo =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeRecordConstructorInfo
 
     let unionTagReader =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeUnionTagReader
 
     let unionTagMemberInfo =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeUnionTagMemberInfo
 
     let unionConstructorInfo =
         DictCache.create
-            unionCaseFullName
+            unionCaseKey
             FSharpValue.PreComputeUnionConstructorInfo
 
     let unionConstructor =
         DictCache.create
-            unionCaseFullName
+            unionCaseKey
             FSharpValue.PreComputeUnionConstructor
 
     let unionReader =
         DictCache.create
-            unionCaseFullName
+            unionCaseKey
             FSharpValue.PreComputeUnionReader
 
     let tupleReader =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeTupleReader
 
     let tuplePropertyInfo =
@@ -71,12 +71,12 @@ type FSharpValueCache() =
 
     let tupleConstructor =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeTupleConstructor
 
     let tupleConstructorInfo =
         DictCache.create
-            typeFullName
+            typeKey
             FSharpValue.PreComputeTupleConstructorInfo
 
     static member private lazyShared = lazy (FSharpValueCache())

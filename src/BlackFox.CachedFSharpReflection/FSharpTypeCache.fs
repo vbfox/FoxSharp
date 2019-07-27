@@ -5,59 +5,62 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpTypeCache() =
+    let typeKey (t: Type) =
+        t.FullName
+        
     let isFunction =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsFunction
 
     let isModule =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsModule
 
     let isTuple =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsTuple
 
     let isRecord =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsRecord
 
     let isUnion =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsUnion
 
     let isExceptionRepresentation =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.IsExceptionRepresentation
 
     let getTupleElements =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.GetTupleElements
 
     let getFunctionElements =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.GetFunctionElements
 
     let getRecordFields =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.GetRecordFields
 
     let getUnionCases =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.GetUnionCases
 
     let getExceptionFields =
         DictCache.create
-            (fun (t: Type) -> t.FullName)
+            typeKey
             FSharpType.GetExceptionFields
 
     static member private lazyShared = lazy (FSharpTypeCache())
