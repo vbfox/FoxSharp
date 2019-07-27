@@ -10,6 +10,7 @@
     <Compile Include="DictCache.fs" />
     <Compile Include="FSharpTypeCache.fs" />
     <Compile Include="FSharpValueCache.fs" />
+    <Compile Include="FSharpReflectionCache.fs" />
   </ItemGroup>
 
 </Project>
