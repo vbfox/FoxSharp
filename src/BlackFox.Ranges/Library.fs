@@ -3,11 +3,18 @@ namespace BlackFox.Ranges
 open System
 open System.Collections.Generic
 
+[<Flags>]
+type IntervalEndpoints =
+    | Open = 0
+    | RightClosed = 1
+    | LeftClosed = 2
+    | Closed = 3
+
 [<Struct>]
 type RangeData<'t> =
     | Empty
     | Scalar of scalarValue : 't
-    | Continuous of continuousMin: 't * continuousMax: 't
+    | Continuous of continuousMin: 't * continuousMax: 't * endpoints: IntervalEndpoints
     | Dicrete of discreteValues : 't []
     | Composite of compositeRanges : RangeData<'t> []
 
@@ -54,7 +61,8 @@ module Range =
         | Empty
         | Scalar _
         | Dicrete _ -> true
-        | Continuous (min, max) -> comparer.Compare(min, max) = 0
+        | Continuous (min, max, _) ->
+            comparer.Compare(max, min) <= 0
         | Composite comp ->
             let mutable i = 0
             let mutable countable = true
