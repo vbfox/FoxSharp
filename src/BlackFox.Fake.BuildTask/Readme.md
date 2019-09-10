@@ -28,8 +28,10 @@ let build = BuildTask.create "Build" [clean.IfNeeded; paketRestore] {
 // run in CI
 let _ci = BuildTask.createEmpty "CI" [clean; build]
 
-RunTaskOrDefault build
+BuildTask.runOrDefault build
 ```
+
+You can find a more explanatory blog [here](https://blog.vbfox.net/2018/09/12/fake-typed-targets.html)
 
 ## API
 
