@@ -168,11 +168,15 @@ let getLegacy(): VsSetupInstance list =
         List.empty
     else
         try
-            let hklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-            let vs7Root = hklm32.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")
+            use hklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+            use vs7Root = hklm32.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")
             let detectedInstance = 
-                vs7Root.GetValueNames() 
-                |> Seq.where (fun x -> Map.containsKey x legacyVsNames)
+                match vs7Root with
+                | null ->
+                    Seq.empty
+                | _ ->
+                    vs7Root.GetValueNames() 
+                    |> Seq.where (fun x -> Map.containsKey x legacyVsNames)
             detectedInstance 
             |> Seq.choose (fun x ->
                 try
@@ -229,7 +233,7 @@ let getAll (): VsSetupInstance list =
 /// </summary>
 [<CompiledName("GetAllWithLegacy")>]
 let getAllWithLegacy (): VsSetupInstance list =
-    (getAll(), getLegacy()) ||> List.append 
+    getAll() @ getLegacy()
 
 /// Get VS2017+ instances that are completely installed
 [<CompiledName("GetCompleted")>]
