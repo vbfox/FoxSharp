@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>VsWhere</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.2.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlackFox.VsWhere\BlackFox.VsWhere.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.fs" />
+  </ItemGroup>
+</Project>
