@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageProjectUrl>https://github.com/vbfox/FoxSharp</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/vbfox/FoxSharp/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/vbfox/FoxSharp.git</RepositoryUrl>
     <Authors>Julien Roncaglia</Authors>
     <Owners>Julien Roncaglia</Owners>
