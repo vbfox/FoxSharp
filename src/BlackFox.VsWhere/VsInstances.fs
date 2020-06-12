@@ -147,67 +147,98 @@ let private parseInstanceOrNone (instance: ISetupInstance) =
         Trace.TraceError("Failed to parse Visual Studio ISetupInstance: {0}", exn)
         None
 
-let private legacyVsNames = Map.ofArray [|
-    ("7.0", "Visual Studio .NET 2002")
-    ("7.1", "Visual Studio .NET 2003")
-    ("8.0", "Visual Studio 2005")
-    ("9.0", "Visual Studio 2008")
-    ("10.0", "Visual Studio 2010")
-    ("11.0", "Visual Studio 2012")
-    ("12.0", "Visual Studio 2013")
-    ("14.0", "Visual Studio 2015")
-|]
+module private Legacy =
+    open System.IO
+
+    let private legacyVsNames = Map.ofArray [|
+        ("7.0", "Visual Studio .NET 2002")
+        ("7.1", "Visual Studio .NET 2003")
+        ("8.0", "Visual Studio 2005")
+        ("9.0", "Visual Studio 2008")
+        ("10.0", "Visual Studio 2010")
+        ("11.0", "Visual Studio 2012")
+        ("12.0", "Visual Studio 2013")
+        ("14.0", "Visual Studio 2015")
+    |]
+
+    let private legacyProductPath = "Common7\\IDE\\devenv.exe"
+
+    let getAll() =
+        if Environment.OSVersion.Platform <> PlatformID.Win32NT then
+            List.empty
+        else
+            try
+                use hklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                use vs7Root = hklm32.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")
+                let detectedInstance =
+                    match vs7Root with
+                    | null ->
+                        Seq.empty
+                    | _ ->
+                        vs7Root.GetValueNames()
+                        |> Seq.where (fun valueName -> Map.containsKey valueName legacyVsNames)
+                detectedInstance
+                |> Seq.choose (fun (version) ->
+                    try
+                        let installationPath = vs7Root.GetValue(version) |> string
+                        let productPathFull = Path.Combine(installationPath, legacyProductPath)
+                        let installDate =
+                            try
+                                DateTimeOffset(Directory.GetCreationTimeUtc(installationPath))
+                            with
+                            _ -> DateTimeOffset.MinValue
+                        let productPathExists =
+                            try
+                                File.Exists productPathFull
+                            with
+                            _ -> false
+                        let fullVersion =
+                            if productPathExists then
+                                try
+                                    defaultArg
+                                        (FileVersionInfo.GetVersionInfo(productPathFull).ProductVersion |> Option.ofObj)
+                                        version
+                                with
+                                _ -> version
+                            else
+                                version
+
+                        {
+                            InstanceId = "VisualStudio." + version
+                            InstallDate = installDate
+                            InstallationName = "VisualStudio/" + fullVersion
+                            InstallationPath = installationPath
+                            InstallationVersion = fullVersion
+                            DisplayName = legacyVsNames |> Map.find version
+                            Description = ""
+                            State = None
+                            Packages = List.empty
+                            Product = None
+                            ProductPath = if productPathExists then Some legacyProductPath else None
+                            Errors = None
+                            IsLaunchable = None
+                            IsComplete = None
+                            Properties = Map.empty
+                            EnginePath = None
+                            IsPrerelease = None
+                            CatalogInfo = Map.empty
+                        }
+                        |> Some
+                    with
+                    | exn ->
+                        Trace.TraceError("Failed to parse legacy Visual Studio: {0}", exn)
+                        None)
+                |> List.ofSeq
+            with
+            | _ -> List.empty
 
 /// <summary>
-/// Get legacy VS instances (before VS2017). 
-/// Note that the information for legacy ones is limited.
+/// Get legacy VS instances (before VS2017: VS .NET 2002 to VS2015).
+/// <para>Note that the information for legacy ones is limited.</para>
 /// </summary>
 [<CompiledName("GetLegacy")>]
-let getLegacy(): VsSetupInstance list = 
-    if Environment.OSVersion.Platform <> PlatformID.Win32NT then
-        List.empty
-    else
-        try
-            use hklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-            use vs7Root = hklm32.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")
-            let detectedInstance = 
-                match vs7Root with
-                | null ->
-                    Seq.empty
-                | _ ->
-                    vs7Root.GetValueNames() 
-                    |> Seq.where (fun x -> Map.containsKey x legacyVsNames)
-            detectedInstance 
-            |> Seq.choose (fun x ->
-                try
-                    {
-                        InstanceId = "VisualStudio." + x
-                        InstallDate = DateTimeOffset.MinValue
-                        InstallationName = "VisualStudio/" + x
-                        InstallationPath = vs7Root.GetValue(x) |> string
-                        InstallationVersion = x
-                        DisplayName = Map.find x legacyVsNames
-                        Description = ""
-                        State = None
-                        Packages = List.empty
-                        Product = None
-                        ProductPath = None
-                        Errors = None
-                        IsLaunchable = None
-                        IsComplete = None
-                        Properties = Map.empty
-                        EnginePath = None
-                        IsPrerelease = None
-                        CatalogInfo = Map.empty
-                    }
-                    |> Some
-                with
-                | exn ->
-                    Trace.TraceError("Failed to parse legacy Visual Studio: {0}", exn)
-                    None)
-            |> List.ofSeq
-        with
-        | exn -> List.empty
+let getLegacy(): VsSetupInstance list =
+    Legacy.getAll()
 
 /// <summary>
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
@@ -228,8 +259,8 @@ let getAll (): VsSetupInstance list =
             List.empty
 
 /// <summary>
-/// Get all Visual Studio instances including legacy VS instances (before VS2017). 
-/// Note that the information for legacy ones is limited.
+/// Get all Visual Studio instances including legacy VS instances (before VS2017).
+/// <para>Note that the information for legacy ones is limited.</para>
 /// </summary>
 [<CompiledName("GetAllWithLegacy")>]
 let getAllWithLegacy (): VsSetupInstance list =
