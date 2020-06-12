@@ -7,7 +7,7 @@ indent_size = 4
 insert_final_newline = true
 
 # Xml project files
-[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+[*.{fsproj,csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 2
 
 # Xml config files
