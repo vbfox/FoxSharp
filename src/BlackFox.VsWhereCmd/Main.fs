@@ -9,5 +9,4 @@ let main _args =
         printfn "    %s" i.InstallationPath
         printfn ""
 
-
     0
