@@ -3,6 +3,7 @@ module BlackFox.VsWhere.VsInstances
 open System
 open System.Diagnostics
 open System.Runtime.InteropServices
+open Microsoft.Win32
 
 let inline private emptySeqIfNull (s: _ seq) =
     if isNull s then
@@ -146,6 +147,68 @@ let private parseInstanceOrNone (instance: ISetupInstance) =
         Trace.TraceError("Failed to parse Visual Studio ISetupInstance: {0}", exn)
         None
 
+let private legacyVsNames = Map.ofArray [|
+    ("7.0", "Visual Studio .NET 2002")
+    ("7.1", "Visual Studio .NET 2003")
+    ("8.0", "Visual Studio 2005")
+    ("9.0", "Visual Studio 2008")
+    ("10.0", "Visual Studio 2010")
+    ("11.0", "Visual Studio 2012")
+    ("12.0", "Visual Studio 2013")
+    ("14.0", "Visual Studio 2015")
+|]
+
+/// <summary>
+/// Get legacy VS instances (before VS2017). 
+/// Note that the information for legacy ones is limited.
+/// </summary>
+[<CompiledName("GetLegacy")>]
+let getLegacy(): VsSetupInstance list = 
+    if Environment.OSVersion.Platform <> PlatformID.Win32NT then
+        List.empty
+    else
+        try
+            use hklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+            use vs7Root = hklm32.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")
+            let detectedInstance = 
+                match vs7Root with
+                | null ->
+                    Seq.empty
+                | _ ->
+                    vs7Root.GetValueNames() 
+                    |> Seq.where (fun x -> Map.containsKey x legacyVsNames)
+            detectedInstance 
+            |> Seq.choose (fun x ->
+                try
+                    {
+                        InstanceId = "VisualStudio." + x
+                        InstallDate = DateTimeOffset.MinValue
+                        InstallationName = "VisualStudio/" + x
+                        InstallationPath = vs7Root.GetValue(x) |> string
+                        InstallationVersion = x
+                        DisplayName = Map.find x legacyVsNames
+                        Description = ""
+                        State = None
+                        Packages = List.empty
+                        Product = None
+                        ProductPath = None
+                        Errors = None
+                        IsLaunchable = None
+                        IsComplete = None
+                        Properties = Map.empty
+                        EnginePath = None
+                        IsPrerelease = None
+                        CatalogInfo = Map.empty
+                    }
+                    |> Some
+                with
+                | exn ->
+                    Trace.TraceError("Failed to parse legacy Visual Studio: {0}", exn)
+                    None)
+            |> List.ofSeq
+        with
+        | exn -> List.empty
+
 /// <summary>
 /// Get all VS2017+ instances (Visual Studio stable, preview, Build tools, ...)
 /// <para>This method return instances that have installation errors and pre-releases.</para>
@@ -163,6 +226,14 @@ let getAll (): VsSetupInstance list =
         with
         | :? COMException ->
             List.empty
+
+/// <summary>
+/// Get all Visual Studio instances including legacy VS instances (before VS2017). 
+/// Note that the information for legacy ones is limited.
+/// </summary>
+[<CompiledName("GetAllWithLegacy")>]
+let getAllWithLegacy (): VsSetupInstance list =
+    getAll() @ getLegacy()
 
 /// Get VS2017+ instances that are completely installed
 [<CompiledName("GetCompleted")>]
