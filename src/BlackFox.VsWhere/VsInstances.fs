@@ -259,7 +259,7 @@ let getAll (): VsSetupInstance list =
             List.empty
 
 /// <summary>
-/// Get all Visual Studio instances including legacy VS instances (before VS2017).
+/// Get all Visual Studio instances including legacy VS instances (before VS2017: VS .NET 2002 to VS2015).
 /// <para>Note that the information for legacy ones is limited.</para>
 /// </summary>
 [<CompiledName("GetAllWithLegacy")>]

@@ -22,6 +22,14 @@ module BlackFox.VsWhere.VsInstances =
 
     /// Get VS2017+ instances that are completely installed and have a specific package ID installed
     let getWithPackage (packageId: string) (includePrerelease: bool): VsSetupInstance list =
+
+    /// Get legacy VS instances (before VS2017: VS .NET 2002 to VS2015).
+    /// Note that the information for legacy ones is limited.
+    let getLegacy(): VsSetupInstance list =
+
+    /// Get all Visual Studio instances including legacy VS instances (before VS2017: VS .NET 2002 to VS2015).
+    /// Note that the information for legacy ones is limited.
+    let getAllWithLegacy (): VsSetupInstance list =
 ```
 
 Package IDs for components and workloads [are documented on docs.microsoft.com](https://docs.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2017).

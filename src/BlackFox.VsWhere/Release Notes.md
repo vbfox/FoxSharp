@@ -1,3 +1,9 @@
+### New in 1.1.0
+
+* Add 2 new functions `getLegacy` and `getAllWithLegacy` that support versions before `ISetupInstance` existed
+  (From Visual Studio .NET 2002 to Visual Studio 2015) via their registry keys
+  (Thanks [@1354092549](https://github.com/1354092549))
+
 ### New in 1.0.0
 
 * No changes but as FAKE is using the library the API shouldn't change now.
