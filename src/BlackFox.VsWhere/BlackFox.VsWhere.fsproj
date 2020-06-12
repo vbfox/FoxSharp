@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.0.0.1" Condition="'$(TargetFramework)' == 'net45'" />
     <PackageReference Include="FSharp.Core" Version="4.2.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComTypes.fs" />
