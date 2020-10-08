@@ -27,9 +27,11 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
     - uses: actions/checkout@v2
+    - name: Dir
+      run: dir
     - name: Restore packages
-      run: paket.exe restore
+      run: ./paket.exe restore
     - name: Compile build script
       run: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
     - name: Build
-      run: build.cmd CI
+      run: ./build.cmd CI
