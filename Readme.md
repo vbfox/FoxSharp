@@ -1,7 +1,7 @@
 🦊 Sharp
 ========
 
-[![Github Actions Status](https://github.com/vbfox/FoxSharp/workflows/CI/badge.svg?branch=master)
+[![Github Actions Status](https://github.com/vbfox/FoxSharp/workflows/CI/badge.svg?branch=master)](https://github.com/vbfox/FoxSharp/actions?query=workflow%3ACI)
 
 A collection of .Net NuGet packages that I maintain, developed in F#.
 
