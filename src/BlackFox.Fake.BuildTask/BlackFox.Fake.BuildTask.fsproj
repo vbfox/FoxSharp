@@ -6,11 +6,14 @@
     <Description>Typed `Target` for FAKE 5</Description>
     <PackageTags>build;FAKE</PackageTags>
     <PackageProjectUrl>https://github.com/vbfox/FoxSharp/tree/master/src/BlackFox.Fake.BuildTask</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/vbfox/FoxSharp/master/src/BlackFox.Fake.BuildTask/Icon.png</PackageIconUrl>
+    <PackageIcon>Icon.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
     <PackageReference Include="Fake.Core.Target" Version="5.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icon.png" Pack="true" PackagePath=""/>
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />
