@@ -1,7 +1,7 @@
 🦊 Sharp
 ========
 
-[![Azure Pipelines Status](https://vbfox.visualstudio.com/FoxSharp/_apis/build/status/FoxSharp%20CI?branchName=master)](https://vbfox.visualstudio.com/FoxSharp/_build/latest?definitionId=6&branchName=master)
+[![Github Actions Status](https://github.com/vbfox/FoxSharp/workflows/CI/badge.svg?branch=master)
 
 A collection of .Net NuGet packages that I maintain, developed in F#.
 
