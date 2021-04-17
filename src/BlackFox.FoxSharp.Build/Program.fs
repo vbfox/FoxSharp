@@ -7,7 +7,7 @@ open Fake.BuildServer
 [<EntryPoint>]
 let main argv =
     BuildTask.setupContextFromArgv argv
-    BuildServer.install [ TeamFoundation.Installer ]
+    BuildServer.install [ GitHubActions.Installer ]
 
     let defaultTask = Tasks.createAndGetDefault ()
     BuildTask.runOrDefaultApp defaultTask
