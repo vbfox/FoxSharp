@@ -107,7 +107,7 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "Test" [buildTests] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
-        let testConfs = ["netcoreapp2.0", ".dll"]
+        let testConfs = ["netcoreapp2.0", ".dll"; "net5.0", ".dll"]
         let testConfs =
             if Environment.isWindows then
                 ("net461", ".exe") :: testConfs
