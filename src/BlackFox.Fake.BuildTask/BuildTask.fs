@@ -115,7 +115,7 @@ let listAvailable (): unit =
 
 /// <summary>Writes a dependency graph.</summary>
 /// <param name="verbose">Whether to print verbose output or not.</param>
-/// <param name="target">The target for which the dependencies should be printed.</param>
+/// <param name="taskInfo">The target for which the dependencies should be printed.</param>
 let printDependencyGraph (verbose: bool) (taskInfo: TaskInfo): unit =
     match taskInfo.Metadata with
     | Some metadata ->
