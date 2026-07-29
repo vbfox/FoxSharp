@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="JavaPropertiesFileTests.fs" />
+    <Compile Include="CachedFSharpReflectionTests.fs" />
     <Compile Include="CmdLineTests.fs" />
     <Compile Include="MsvcrCommandLineTests.fs" />
     <Compile Include="MonoUnixCommandLineTests.fs" />
@@ -21,6 +22,7 @@
     <ProjectReference Include="..\BlackFox.CommandLine.TestParsers\BlackFox.CommandLine.TestParsers.csproj" />
     <ProjectReference Include="..\BlackFox.JavaPropertiesFile\BlackFox.JavaPropertiesFile.fsproj" />
     <ProjectReference Include="..\BlackFox.PathEnvironment\BlackFox.PathEnvironment.fsproj" />
+    <ProjectReference Include="..\BlackFox.CachedFSharpReflection\BlackFox.CachedFSharpReflection.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

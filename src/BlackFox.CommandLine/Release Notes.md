@@ -1,3 +1,8 @@
+### New in 1.0.1
+
+* Document that the escaping targets the runtime argument parsers and not a shell, and must not be used with
+  `UseShellExecute`, `cmd.exe`, `sh -c` or a `.bat`/`.cmd` file
+
 ### New in 1.0.0
 
 * Breaking change: Use the same signature for `CmdLine.concat` as the standard modules: `CmdLine seq -> CmdLine`

@@ -6,6 +6,38 @@
 
 Generate, parse and escape command lines.
 
+## Security
+
+The escaping done by this library targets the code that turns a command line **string** back into an argument
+**array**: the Microsoft C Runtime / `CommandLineToArgvW` on Windows, the equivalent parser in
+`System.Diagnostics.Process` on .Net Core and .Net 5+, and Mono's own parser on Unix. `CmdLine.toString` detects the
+runtime it's on and picks the matching one, so its result is safe to assign to `ProcessStartInfo.Arguments`.
+
+It is **not** shell escaping, and passing the result to a shell can let an argument run commands of its own:
+
+* Never set `ProcessStartInfo.UseShellExecute` to `true` with it, and never pass it to `cmd.exe /c`, `sh -c`,
+  `bash -c` or `powershell -Command`. Shell metacharacters (`&`, `|`, `>`, `` ` ``, `$`, `;`, `^`, …) are not
+  quoted by any of the escaping rules implemented here, because the parsers they target give them no special
+  meaning. A shell does.
+* On Windows, starting a `.bat` or `.cmd` file always goes through `cmd.exe`, even from `Process.Start` with
+  `UseShellExecute = false`. Arguments escaped for the C runtime are therefore not safe for a batch file — this is
+  the [BatBadBut][BatBadBut] class of vulnerability ([CVE-2024-24576][CVE-2024-24576] and friends). Invoke the
+  interpreter or the real executable directly, or validate the arguments against an allow-list.
+* `MonoUnixCommandLine.escape` escapes `'` as `\'` inside a single quoted block because that is what Mono's parser
+  expects. A POSIX shell does not: it would end the quoted block there and run the rest of the argument as code.
+* `CmdLine.appendRaw` is inserted verbatim, quoting is the caller's job. Never build a raw argument out of a value
+  you don't control.
+
+If your target accepts an argument array (`ProcessStartInfo.ArgumentList` on .Net Core 2.1+, `execve`, …) prefer it
+over any escaped string, there is then nothing to escape and nothing to get wrong.
+
+`MsvcrCommandLine.parse` implements the rules that apply to the argument string. The name of the executable at the
+start of a full Windows command line follows different rules (backslashes are never escape characters there), so
+don't use `parse` to decide which program a command line would start.
+
+[BatBadBut]: https://flatt.tech/research/posts/batbadbut-you-cant-securely-execute-commands-on-windows/
+[CVE-2024-24576]: https://github.com/advisories/GHSA-q455-m56c-85mh
+
 ## API
 
 ```fsharp

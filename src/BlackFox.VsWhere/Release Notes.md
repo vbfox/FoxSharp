@@ -1,3 +1,9 @@
+### New in 1.2.0
+
+* Fix `ISetupInstance2` being declared with the IID of `ISetupInstance`. The runtime type test used to pick the
+  `ISetupInstance2` branch for every instance, including the older ones that only implement `ISetupInstance`, and
+  calling the extra methods on those went past the end of their vtable
+
 ### New in 1.1.0
 
 * Add 2 new functions `getLegacy` and `getAllWithLegacy` that support versions before `ISetupInstance` existed

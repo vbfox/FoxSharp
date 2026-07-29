@@ -55,6 +55,9 @@ type private ISetupFailedPackageReference =
     abstract member GetUniqueId : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
     abstract member GetIsExtension : unit -> [<MarshalAs(UnmanagedType.VariantBool)>] bool
 
+// TODO: This is the IID of `ISetupFailedPackageReference`, the real one has to be taken from `Setup.Configuration.h`.
+// Nothing casts to this interface at the moment so it is inert, but a type test against it would always succeed and
+// calling `GetLogFilePath` or `GetDescription` would then go past the end of the vtable.
 [<Guid("E73559CD-7003-4022-B134-27DC650B280F")>]
 [<InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
 [<ComImport>]
@@ -123,7 +126,7 @@ type private ISetupPropertyStore =
     abstract member GetNames : unit -> [<MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)>] string[]
     abstract member GetValue: [<MarshalAs(UnmanagedType.LPWStr)>][<In>] pwszName: string -> obj
 
-[<Guid("B41463C3-8866-43B5-BC33-2B0676F7F42E")>]
+[<Guid("89143C9A-05AF-49B0-B717-72E218A2185C")>]
 [<InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
 [<ComImport>]
 [<AllowNullLiteral>]

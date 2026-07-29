@@ -5,14 +5,18 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpValueCache() =
+    // The `Type` instance itself is the key: `Type.FullName` isn't unique (the same full name can be defined by
+    // different assemblies, different versions of an assembly, or the same assembly loaded in several
+    // `AssemblyLoadContext`) and is `null` for generic parameters, so using it would hand out a pre-computed reader or
+    // constructor belonging to an unrelated type.
     let typeKey (t: Type) =
-        t.FullName
+        t
 
     let propertyKey (p: PropertyInfo) =
-        struct(p.DeclaringType.FullName, p.Name)
+        struct(p.DeclaringType, p.Name)
 
     let unionCaseKey (c: UnionCaseInfo) =
-        struct(c.DeclaringType.FullName, c.Name)
+        struct(c.DeclaringType, c.Name)
 
     let recordFieldReader =
         DictCache.create
@@ -66,7 +70,7 @@ type FSharpValueCache() =
 
     let tuplePropertyInfo =
         DictCache.create
-            (fun struct(tupleType: Type, index: int) -> sprintf "%s.%i" tupleType.FullName index)
+            (fun struct(tupleType: Type, index: int) -> struct(tupleType, index))
             (fun struct(tupleType: Type, index: int) -> FSharpValue.PreComputeTuplePropertyInfo(tupleType, index))
 
     let tupleConstructor =

@@ -29,3 +29,13 @@ cache.IsRecord(typeof<Foo>) // True
 cache.IsUnion(typeof<Foo>) // False
 
 ```
+
+## Cache lifetime
+
+Entries are keyed on the `System.Type` and `System.Reflection.MemberInfo` instances themselves and are kept until
+`Clear()` is called. A cache therefore keeps the types it has seen — and the assemblies that define them — alive for
+as long as it lives, and `Shared` lives for as long as the process.
+
+If your application loads assemblies that are meant to be unloaded again (a plugin host using a collectible
+`AssemblyLoadContext`) don't use `Shared` for their types: give each load context its own cache instance and drop it
+together with the context, or call `Clear()` when unloading.

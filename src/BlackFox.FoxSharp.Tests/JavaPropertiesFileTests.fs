@@ -308,6 +308,13 @@ let javaParity =
 
             Expect.equal "eq" expected parsed
 
+        // `IsWhitespace` used to match U+00FF, almost certainly a typo for the form feed U+000C.
+        testCase "U+00FF is an ordinary character, not whitespace" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "\u00fffoo=\u00ffbar"
+            let expected = [ KeyValue("\u00fffoo", "\u00ffbar") ]
+
+            Expect.equal "eq" expected parsed
+
         testCase "Line continuation while parsing the key strips leading whitespace of the next line" <| fun () ->
             let parsed = JavaPropertiesFile.parseString "ke\\\n   y=value"
             let expected = [ KeyValue("key", "value") ]

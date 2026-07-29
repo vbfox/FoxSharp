@@ -5,9 +5,13 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpTypeCache() =
+    // The `Type` instance itself is the key: `Type.FullName` isn't unique (the same full name can be defined by
+    // different assemblies, different versions of an assembly, or the same assembly loaded in several
+    // `AssemblyLoadContext`) and is `null` for generic parameters, so using it would return the cached result of an
+    // unrelated type.
     let typeKey (t: Type) =
-        t.FullName
-        
+        t
+
     let isFunction =
         DictCache.create
             typeKey

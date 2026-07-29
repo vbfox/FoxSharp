@@ -54,7 +54,8 @@ module private PathEnvironmentUtils =
 open PathEnvironmentUtils
 
 type PathEnvironment =
-    /// Directories in the system PATH
+    /// Directories in the system PATH.
+    /// Empty entries are removed, they would otherwise be resolved against the current directory.
     [<CompiledName("Path")>]
     static member path
         with get() = getPath()
@@ -65,13 +66,28 @@ type PathEnvironment =
     static member pathExt
         with get() = getPathExt()
 
-    /// Find an executable on the PATH
+    /// <summary>Find an executable on the PATH</summary>
+    /// <remarks>
+    /// <para><c>name</c> is combined with each directory as a relative path, a <c>name</c> that contains directory
+    /// separators or <c>..</c> can therefore designate a file outside of the PATH directories. Don't pass a name
+    /// coming from an untrusted source without validating it first.</para>
+    /// <para>When <c>includeCurrentDirectory</c> is <c>true</c> the current directory is searched
+    /// before the PATH, as Windows does when starting a process. A file dropped in the current
+    /// directory then takes precedence over the system one, only enable it when that is what you want.</para>
+    /// </remarks>
     [<CompiledName("FindExecutable")>]
     static member findExecutable (name: string) (includeCurrentDirectory: bool) =
         let dirs = addCwd includeCurrentDirectory PathEnvironment.path
         findProgramInDirs dirs (PathEnvironment.pathExt |> List.ofArray) name
 
-    /// Find a file on the PATH
+    /// <summary>Find a file on the PATH</summary>
+    /// <remarks>
+    /// <para><c>name</c> is combined with each directory as a relative path, a <c>name</c> that contains directory
+    /// separators or <c>..</c> can therefore designate a file outside of the PATH directories. Don't pass a name
+    /// coming from an untrusted source without validating it first.</para>
+    /// <para>When <c>includeCurrentDirectory</c> is <c>true</c> the current directory is searched
+    /// before the PATH.</para>
+    /// </remarks>
     [<CompiledName("FindFile")>]
     static member findFile (name: string) (includeCurrentDirectory: bool) =
         let dirs = addCwd includeCurrentDirectory PathEnvironment.path
