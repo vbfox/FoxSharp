@@ -15,13 +15,13 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: Install legacy libssl (required by netcoreapp2.0 test runtime)
       run: |
         wget -q http://launchpadlibrarian.net/555132422/libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
         sudo dpkg -i libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
         rm libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
         dotnet-version: |
           2
@@ -40,8 +40,8 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
         dotnet-version: |
           2
