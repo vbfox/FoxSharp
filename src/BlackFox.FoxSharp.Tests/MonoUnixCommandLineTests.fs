@@ -4,12 +4,14 @@ open Expecto
 open Expecto.Flip
 open BlackFox.CommandLine
 open FsCheck
+open FsCheck.FSharp
 
 type NotZeroChar = | NotZeroChar of string
 
 type NotZeroCharGenerator =
     static member Generator() =
-        Arb.from<string>
+        ArbMap.defaults
+        |> ArbMap.arbitrary<string>
         |> Arb.filter (fun (s: string) -> s <> null && not (s.ToCharArray() |> Array.contains '\x00'))
         |> Arb.convert NotZeroChar (fun (NotZeroChar s) -> s)
 

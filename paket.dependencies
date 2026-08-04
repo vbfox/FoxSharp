@@ -1,7 +1,7 @@
 version 5.245.4
 
 source https://api.nuget.org/v3/index.json
-framework: net5.0,netcoreapp2.0,netstandard2.0,>=net45
+framework: net10.0,netcoreapp2.0,netstandard2.0,>=net45
 storage:none
 
 nuget FSharp.Core
@@ -13,24 +13,24 @@ nuget FsCheck
 group build
     source https://api.nuget.org/v3/index.json
     storage: none
-    framework: net5.0
+    framework: net10.0
 
-    nuget FSharp.Core ~> 4
+    nuget FSharp.Core
     nuget System.ValueTuple ~> 4.5
     nuget BlackFox.Fake.BuildTask
 
-    nuget Fake.Core.Target
-    nuget Fake.Core.Environment
-    nuget Fake.Core.Process
-    nuget Fake.Core.Trace
-    nuget Fake.Core.ReleaseNotes
-    nuget Fake.Core.UserInput
-    nuget Fake.IO.FileSystem
-    nuget Fake.IO.Zip
-    nuget Fake.Tools.Git
-    nuget Fake.DotNet.Cli
-    nuget Fake.DotNet.AssemblyInfoFile
-    nuget Fake.DotNet.Testing.Expecto
-    nuget Fake.DotNet.Paket
-    nuget Fake.BuildServer.GitHubActions
-    nuget Fake.Api.GitHub
+    nuget Fake.Core.Target ~> 5
+    nuget Fake.Core.Environment ~> 5
+    nuget Fake.Core.Process ~> 5
+    nuget Fake.Core.Trace ~> 5
+    nuget Fake.Core.ReleaseNotes ~> 5
+    nuget Fake.Core.UserInput ~> 5
+    nuget Fake.IO.FileSystem ~> 5
+    nuget Fake.IO.Zip ~> 5
+    nuget Fake.Tools.Git ~> 5
+    nuget Fake.DotNet.Cli ~> 5
+    nuget Fake.DotNet.AssemblyInfoFile ~> 5
+    nuget Fake.DotNet.Testing.Expecto ~> 5
+    nuget Fake.DotNet.Paket ~> 5
+    nuget Fake.BuildServer.GitHubActions ~> 5
+    nuget Fake.Api.GitHub ~> 5

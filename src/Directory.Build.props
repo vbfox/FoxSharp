@@ -14,7 +14,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>FS2003</NoWarn>
+    <NoWarn>FS2003;NU1901;NU1902;NU1903;NU1904;NETSDK1138</NoWarn>
+    <!-- Paket lists transitive dependencies as direct PackageReferences, which conflicts with NuGet's package pruning feature -->
+    <RestoreEnablePackagePruning>false</RestoreEnablePackagePruning>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
