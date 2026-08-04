@@ -13,9 +13,14 @@ module private PathEnvironmentUtils =
         | PlatformID.Xbox -> false
         | _ -> true
 
+    let private tryCombine (dir: string) (name: string) =
+        try
+            Some (Path.Combine(dir, name))
+        with :? ArgumentException -> None
+
     let findFileInDirs dirs names =
         dirs
-        |> Seq.collect (fun dir -> names |> List.map (fun name -> Path.Combine(dir, name)))
+        |> Seq.collect (fun dir -> names |> List.choose (tryCombine dir))
         |> Seq.tryFind(File.Exists)
 
     let findProgramInDirs dirs programExts name =
@@ -25,14 +30,18 @@ module private PathEnvironmentUtils =
 
     let envVarOrEmpty name =
         let value = Environment.GetEnvironmentVariable(name)
-        if isNull name then "" else value
+        if isNull value then "" else value
+
+    let private splitPathList (value: string) =
+        value.Split(Path.PathSeparator)
+        |> Array.filter (String.IsNullOrEmpty >> not)
 
     let getPath () =
-        (envVarOrEmpty "PATH").Split(Path.PathSeparator)
+        splitPathList (envVarOrEmpty "PATH")
 
     let getPathExt () =
         if Environment.OSVersion.Platform = PlatformID.Win32NT then
-            (envVarOrEmpty "PATHEXT").Split(Path.PathSeparator)
+            splitPathList (envVarOrEmpty "PATHEXT")
         else
             [|""|]
 
