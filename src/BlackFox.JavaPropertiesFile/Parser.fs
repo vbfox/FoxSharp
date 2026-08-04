@@ -15,16 +15,20 @@ type IsEof =
     | Yes = 1y
     | No = 0y
 
-let rec readToFirstChar (c: char option) (reader: CharReader) =
+/// Starting from `c` read until a non whitespace is found if any.
+/// Stop at end of lines
+let rec readToFirstCharOrEolOrEof (c: char option) (reader: CharReader) =
     match c with
     | IsWhitespace _ ->
-        readToFirstChar (reader ()) reader
+        readToFirstCharOrEolOrEof (reader ()) reader
     | Some '\r'
     | Some '\n' ->
         None, IsEof.No
     | Some _ -> c, IsEof.No
     | None -> None, IsEof.Yes
 
+// Match a character to know if it's a potential escape sequence second char ('n' returns Some('n')
+// because "\n" is a valid escape sequence.
 let inline (|EscapeSequence|_|) c =
     match c with
     | Some c ->
@@ -34,9 +38,14 @@ let inline (|EscapeSequence|_|) c =
             None
     | None -> None
 
+/// Returns if a character is a valid hexadecimal character (Upper or Lower case)
 let inline isHex c = (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')
 
-let readEscapeSequence (c: char) (reader: CharReader) =
+/// Read the characters following `\` in an escape sequence. Supporting unicode escapes.
+///
+/// - returns the passed-in character if it's not a known escape sequence
+/// - throws if an unicode escape is invalid
+let readEscapeSequenceAfterBackSlash (c: char) (reader: CharReader) =
     match c with
     | 'r' -> '\r'
     | 'n' -> '\n'
@@ -52,6 +61,7 @@ let readEscapeSequence (c: char) (reader: CharReader) =
             failwith "Invalid unicode escape"
     | _ -> c
 
+/// Read the key part of a key=value line
 let inline readKey (c: char option) (reader: CharReader) (buffer: StringBuilder) =
     let rec recurseEnd (result: string) =
         match reader () with
@@ -62,10 +72,11 @@ let inline readKey (c: char option) (reader: CharReader) (buffer: StringBuilder)
         | Some '\n' -> result, false, None, IsEof.No
         | None -> result, false, None, IsEof.Yes
         | Some c -> result, true, Some c, IsEof.No
+
     let rec recurse (c: char option) (buffer: StringBuilder) (escaping: bool) =
         match c with
         | EscapeSequence c when escaping ->
-            let realChar = readEscapeSequence c reader
+            let realChar = readEscapeSequenceAfterBackSlash c reader
             recurse (reader()) (buffer.Append(realChar)) false
         | Some ' ' -> recurseEnd (buffer.ToString())
         | Some ':'
@@ -88,11 +99,12 @@ let rec readComment (reader: CharReader) (buffer: StringBuilder) =
     | Some c ->
         readComment reader (buffer.Append(c))
 
+/// Read the value part of a key=value line
 let inline readValue (c: char option) (reader: CharReader) (buffer: StringBuilder) =
     let rec recurse (c: char option) (buffer: StringBuilder) (escaping: bool) (cr: bool) (lineStart: bool) =
         match c with
         | EscapeSequence c when escaping ->
-            let realChar = readEscapeSequence c reader
+            let realChar = readEscapeSequenceAfterBackSlash c reader
             recurse (reader()) (buffer.Append(realChar)) false false false
         | Some '\r'
         | Some '\n' ->
@@ -103,8 +115,9 @@ let inline readValue (c: char option) (reader: CharReader) (buffer: StringBuilde
         | None ->
             buffer.ToString(), IsEof.Yes
         | Some _ when lineStart ->
-            let firstChar, _ = readToFirstChar c reader
-            recurse firstChar buffer false false false
+            match readToFirstCharOrEolOrEof c reader with
+            | None, eof -> buffer.ToString(), eof
+            | Some firstChar, _ -> recurse (Some firstChar) buffer false false false
         | Some '\\' -> recurse (reader ()) buffer true false false
         | Some c ->
             recurse (reader()) (buffer.Append(c)) false false false
@@ -112,7 +125,7 @@ let inline readValue (c: char option) (reader: CharReader) (buffer: StringBuilde
     recurse c buffer false false true
 
 let rec readLine (reader: CharReader) (buffer: StringBuilder) =
-    match readToFirstChar (reader ()) reader with
+    match readToFirstCharOrEolOrEof (reader ()) reader with
     | Some '#', _
     | Some '!', _ ->
         readComment reader (buffer.Clear())

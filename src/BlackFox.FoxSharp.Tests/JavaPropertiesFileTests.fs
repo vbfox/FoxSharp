@@ -206,6 +206,53 @@ let specialCases =
     ]
 
 [<Tests>]
+let blankContinuationLine =
+    testList "Blank line after line continuation" [
+        testCase "Whitespace-only continuation line (spaces) doesn't truncate the rest of the file" <| fun () ->
+            let file = "a=1\\\n   \nrole=admin\nssl=on"
+            let parsed = JavaPropertiesFile.parseString file
+            let expected =
+                [
+                    KeyValue("a", "1")
+                    KeyValue("role", "admin")
+                    KeyValue("ssl", "on")
+                ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Whitespace-only continuation line (tabs) doesn't truncate the rest of the file" <| fun () ->
+            let file = "a=1\\\n\t\t\nrole=admin\nssl=on"
+            let parsed = JavaPropertiesFile.parseString file
+            let expected =
+                [
+                    KeyValue("a", "1")
+                    KeyValue("role", "admin")
+                    KeyValue("ssl", "on")
+                ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Whitespace-only continuation line (CRLF) doesn't truncate the rest of the file" <| fun () ->
+            let file = "a=1\\\r\n   \r\nrole=admin\r\nssl=on"
+            let parsed = JavaPropertiesFile.parseString file
+            let expected =
+                [
+                    KeyValue("a", "1")
+                    KeyValue("role", "admin")
+                    KeyValue("ssl", "on")
+                ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Whitespace-only continuation line at end of file" <| fun () ->
+            let file = "a=1\\\n   "
+            let parsed = JavaPropertiesFile.parseString file
+            let expected = [ KeyValue("a", "1") ]
+
+            Expect.equal "eq" expected parsed
+    ]
+
+[<Tests>]
 let fullFiles =
     testList "Fullfiles" [
         testCase "1" <| fun () ->
