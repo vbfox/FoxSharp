@@ -253,6 +253,69 @@ let blankContinuationLine =
     ]
 
 [<Tests>]
+let javaParity =
+    testList "Parity with java.util.Properties" [
+        testCase "Form feed acts as a key/value separator like space and tab" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "foo\fbar"
+            let expected = [ KeyValue("foo", "bar") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Tab acts as a key/value separator like space" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "foo\tbar"
+            let expected = [ KeyValue("foo", "bar") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Form feed is stripped as leading whitespace on a continuation line" <| fun () ->
+            let file = "a=1\\\n\f\f\nrole=admin"
+            let parsed = JavaPropertiesFile.parseString file
+            let expected =
+                [
+                    KeyValue("a", "1")
+                    KeyValue("role", "admin")
+                ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Escaped space in a key is kept literally instead of ending the key" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "fo\\ o:bar"
+            let expected = [ KeyValue("fo o", "bar") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Escaped tab in a key is kept literally instead of ending the key" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "fo\\\to:bar"
+            let expected = [ KeyValue("fo\to", "bar") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Only the first separator is consumed, a second one is part of the value" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "key::value"
+            let expected = [ KeyValue("key", ":value") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Only the first separator is consumed even with whitespace around it" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "key  ::  value"
+            let expected = [ KeyValue("key", ":  value") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Line continuation is honored while still parsing the key" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "ke\\\ny=value"
+            let expected = [ KeyValue("key", "value") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Line continuation while parsing the key strips leading whitespace of the next line" <| fun () ->
+            let parsed = JavaPropertiesFile.parseString "ke\\\n   y=value"
+            let expected = [ KeyValue("key", "value") ]
+
+            Expect.equal "eq" expected parsed
+    ]
+
+[<Tests>]
 let fullFiles =
     testList "Fullfiles" [
         testCase "1" <| fun () ->

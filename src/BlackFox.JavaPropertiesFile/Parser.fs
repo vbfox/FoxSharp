@@ -8,7 +8,7 @@ type CharReader = unit -> char option
 
 let inline (|IsWhitespace|_|) c =
     match c with
-    | Some c -> if c = ' ' || c = '\t' || c = '\u00ff' then Some c else None
+    | Some c -> if c = ' ' || c = '\t' || c = '\f' then Some c else None
     | None -> None
 
 type IsEof =
@@ -63,31 +63,40 @@ let readEscapeSequenceAfterBackSlash (c: char) (reader: CharReader) =
 
 /// Read the key part of a key=value line
 let inline readKey (c: char option) (reader: CharReader) (buffer: StringBuilder) =
-    let rec recurseEnd (result: string) =
+    /// Skip whitespace and, at most, a single ':' or '=' separator between the key and the value.
+    let rec recurseEnd (result: string) (hasSep: bool) =
         match reader () with
         | Some ':'
-        | Some '='
-        | IsWhitespace _ -> recurseEnd result
+        | Some '=' when not hasSep -> recurseEnd result true
+        | IsWhitespace _ -> recurseEnd result hasSep
         | Some '\r'
         | Some '\n' -> result, false, None, IsEof.No
         | None -> result, false, None, IsEof.Yes
         | Some c -> result, true, Some c, IsEof.No
 
-    let rec recurse (c: char option) (buffer: StringBuilder) (escaping: bool) =
+    let rec recurse (c: char option) (buffer: StringBuilder) (escaping: bool) (cr: bool) (lineStart: bool) =
         match c with
         | EscapeSequence c when escaping ->
             let realChar = readEscapeSequenceAfterBackSlash c reader
-            recurse (reader()) (buffer.Append(realChar)) false
-        | Some ' ' -> recurseEnd (buffer.ToString())
-        | Some ':'
-        | Some '=' when not escaping -> recurseEnd (buffer.ToString())
+            recurse (reader()) (buffer.Append(realChar)) false false false
         | Some '\r'
-        | Some '\n' -> buffer.ToString(), false, None, IsEof.No
+        | Some '\n' ->
+            if escaping || (cr && c = Some '\n') then
+                recurse (reader ()) buffer false (c = Some '\r') true
+            else
+                buffer.ToString(), false, None, IsEof.No
         | None -> buffer.ToString(), false, None, IsEof.Yes
-        | Some '\\' -> recurse (reader ()) buffer true
-        | Some c -> recurse (reader ()) (buffer.Append(c)) false
+        | Some _ when lineStart ->
+            match readToFirstCharOrEolOrEof c reader with
+            | None, eof -> buffer.ToString(), false, None, eof
+            | Some firstChar, _ -> recurse (Some firstChar) buffer false false false
+        | IsWhitespace _ when not escaping -> recurseEnd (buffer.ToString()) false
+        | Some ':'
+        | Some '=' when not escaping -> recurseEnd (buffer.ToString()) true
+        | Some '\\' -> recurse (reader ()) buffer true false false
+        | Some c -> recurse (reader ()) (buffer.Append(c)) false false false
 
-    recurse c buffer false
+    recurse c buffer false false false
 
 let rec readComment (reader: CharReader) (buffer: StringBuilder) =
     match reader () with
