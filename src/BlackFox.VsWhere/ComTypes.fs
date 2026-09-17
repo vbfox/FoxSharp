@@ -55,26 +55,6 @@ type private ISetupFailedPackageReference =
     abstract member GetUniqueId : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
     abstract member GetIsExtension : unit -> [<MarshalAs(UnmanagedType.VariantBool)>] bool
 
-[<Guid("E73559CD-7003-4022-B134-27DC650B280F")>]
-[<InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
-[<ComImport>]
-[<AllowNullLiteral>]
-type private ISetupFailedPackageReference2 =
-    inherit ISetupFailedPackageReference
-    abstract member GetId : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetVersion : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetChip : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetLanguage : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetBranch : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetType : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetUniqueId : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetIsExtension : unit -> [<MarshalAs(UnmanagedType.VariantBool)>] bool
-    abstract member GetLogFilePath : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetDescription : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetSignature : unit -> [<MarshalAs(UnmanagedType.BStr)>] string
-    abstract member GetDetails: unit -> [<MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)>] string[]
-    abstract member GetAffectedPackages: unit -> [<MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_UNKNOWN)>] ISetupPackageReference[]
-
 [<Guid("2A2F3292-958E-4905-B36E-013BE84E27AB")>]
 [<InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
 [<ComImport>]
@@ -123,7 +103,7 @@ type private ISetupPropertyStore =
     abstract member GetNames : unit -> [<MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_BSTR)>] string[]
     abstract member GetValue: [<MarshalAs(UnmanagedType.LPWStr)>][<In>] pwszName: string -> obj
 
-[<Guid("B41463C3-8866-43B5-BC33-2B0676F7F42E")>]
+[<Guid("89143C9A-05AF-49B0-B717-72E218A2185C")>]
 [<InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
 [<ComImport>]
 [<AllowNullLiteral>]

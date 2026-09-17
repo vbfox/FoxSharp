@@ -1,3 +1,11 @@
+### New in 1.2.0
+
+* Fix `ISetupInstance2` being declared with the IID of `ISetupInstance`. There has been no release version of
+  Visual Studio where only `ISetupInstance` exists so the change is mostly for correctness.
+* An instance without a product (`GetProduct` returns null for an installation that failed or isn't finished) is no
+  longer dropped from `getAll` with a trace error, it is now returned with `Product = None`. `ProductPath` and
+  `EnginePath` are also `None` instead of `Some null` when the COM API returns null
+
 ### New in 1.1.0
 
 * Add 2 new functions `getLegacy` and `getAllWithLegacy` that support versions before `ISetupInstance` existed

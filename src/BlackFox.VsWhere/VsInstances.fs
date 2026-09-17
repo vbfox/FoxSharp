@@ -129,13 +129,13 @@ let private parseInstance (instance: ISetupInstance) =
         { result with
             State = v2.GetState() |> Some
             Packages = v2.GetPackages() |> emptySeqIfNull |> Seq.map parsePackageReference |> List.ofSeq
-            Product = parsePackageReference (v2.GetProduct()) |> Some
-            ProductPath = v2.GetProductPath() |> Some
+            Product = v2.GetProduct() |> Option.ofObj |> Option.map parsePackageReference
+            ProductPath = v2.GetProductPath() |> Option.ofObj
             Errors = v2.GetErrors() |> Option.ofObj |> Option.map parseErrorState
             IsLaunchable = v2.IsLaunchable() |> Some
             IsComplete = v2.IsComplete() |> Some
             Properties = parseProperties (v2.GetProperties())
-            EnginePath = v2.GetEnginePath() |> Some }
+            EnginePath = v2.GetEnginePath() |> Option.ofObj }
     | _ -> result
 
 let private parseInstanceOrNone (instance: ISetupInstance) =
@@ -151,19 +151,19 @@ module private Legacy =
     open System.IO
 
     let private legacyVsNames = Map.ofArray [|
-        ("7.0", "Visual Studio .NET 2002")
-        ("7.1", "Visual Studio .NET 2003")
-        ("8.0", "Visual Studio 2005")
-        ("9.0", "Visual Studio 2008")
-        ("10.0", "Visual Studio 2010")
-        ("11.0", "Visual Studio 2012")
-        ("12.0", "Visual Studio 2013")
-        ("14.0", "Visual Studio 2015")
+        "7.0", "Visual Studio .NET 2002"
+        "7.1", "Visual Studio .NET 2003"
+        "8.0", "Visual Studio 2005"
+        "9.0", "Visual Studio 2008"
+        "10.0", "Visual Studio 2010"
+        "11.0", "Visual Studio 2012"
+        "12.0", "Visual Studio 2013"
+        "14.0", "Visual Studio 2015"
     |]
 
     let private legacyProductPath = "Common7\\IDE\\devenv.exe"
 
-    let getAll() =
+    let getAll () =
         if Environment.OSVersion.Platform <> PlatformID.Win32NT then
             List.empty
         else
