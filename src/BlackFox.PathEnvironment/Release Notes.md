@@ -4,6 +4,10 @@
 * Fix `path`/`pathExt` throwing a `NullReferenceException` when `PATH`/`PATHEXT` isn't set.
 * On Windows, `pathExt` now falls back to the list built into `cmd.exe` (`.COM;.EXE;.BAT;.CMD;.VBS;.JS;.WS;.MSC`) when `PATHEXT` isn't set, so `findExecutable` can still find programs instead of never matching anything.
 * `findExecutable`/`findFile` no longer throw when a name can't be combined into a path; such candidates are now skipped instead.
+* Fix `findExecutable` on windows not finding a name that already has an executable extension
+  (`findExecutable "node.exe"` looked for `node.exe.COM`, `node.exe.EXE`, … but never for `node.exe`). The name is
+  now also tried as-is when it ends with one of the `PATHEXT` extensions, as `cmd.exe` does. A name with another
+  extension is still not considered executable.
 
 ### New in 0.3.0
 

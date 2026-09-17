@@ -17,9 +17,18 @@ module private PathEnvironmentUtils =
         |> Seq.collect (fun dir -> names |> List.choose (tryCombine dir))
         |> Seq.tryFind(File.Exists)
 
-    let findProgramInDirs dirs programExts name =
+    let findProgramInDirs dirs programExts (name: string) =
+        // ["foo.com"; "foo.exe"; ...] on Windows
+        // ["foo"] on non-Windows
         let namesWithExt = programExts |> List.map ((+) name)
-        let names = if noExtensionsExecutable then name :: namesWithExt else namesWithExt
+
+        // If the input name already has a program extension we prepend it to the search
+        let alreadyHasProgramExt =
+            programExts
+            |> List.exists (fun (ext: string) -> ext <> "" && name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+        let names = if alreadyHasProgramExt then name :: namesWithExt else namesWithExt
+
+        // Search
         findFileInDirs dirs names
 
     let private envVarOrEmpty name =
