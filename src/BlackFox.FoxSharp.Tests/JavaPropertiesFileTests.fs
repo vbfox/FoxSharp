@@ -2,6 +2,7 @@ module BlackFox.FoxSharp.Tests.JavaPropertiesFileTests
 
 open Expecto
 open Expecto.Flip
+open System.IO
 open BlackFox.JavaPropertiesFile
 
 [<Tests>]
@@ -330,6 +331,90 @@ dbuser=vbfox"
                     KeyValue("database", "localhost")
                     KeyValue("dbuser", "vbfox")
                 ]
+
+            Expect.equal "eq" expected parsed
+    ]
+
+[<Tests>]
+let readmeExamples =
+    testList "Readme examples" [
+        testCase "Usage example parses as documented" <| fun () ->
+            let entries = JavaPropertiesFile.parseString "# Database\ndb.host = localhost\ndb.port = 5432"
+            let expected =
+                [
+                    Comment " Database"
+                    KeyValue ("db.host", "localhost")
+                    KeyValue ("db.port", "5432")
+                ]
+
+            Expect.equal "entries" expected entries
+
+            let settings = JavaPropertiesFile.toMap entries
+            Expect.equal "map" (Map.ofList [ ("db.host", "localhost"); ("db.port", "5432") ]) settings
+
+        testCase "toDictionary accepts the list returned by the parser and drops comments" <| fun () ->
+            let d = JavaPropertiesFile.parseString "#c\na=1\nb=2" |> JavaPropertiesFile.toDictionary
+            Expect.equal "count" 2 d.Count
+            Expect.equal "a" "1" d.["a"]
+            Expect.equal "b" "2" d.["b"]
+
+        testCase "Last value wins on duplicate keys, like java.util.Properties" <| fun () ->
+            let entries = JavaPropertiesFile.parseString "a=1\na=2"
+            Expect.equal "map" "2" (JavaPropertiesFile.toMap entries).["a"]
+            Expect.equal "dict" "2" (JavaPropertiesFile.toDictionary entries).["a"]
+
+        testCase "Invalid unicode escape throws" <| fun () ->
+            Expect.throws "throws" (fun () -> JavaPropertiesFile.parseString "key=\\u12" |> ignore)
+    ]
+
+let private withTempFile (bytes: byte[]) (f: string -> 'a) =
+    let path = Path.GetTempFileName()
+    try
+        File.WriteAllBytes(path, bytes)
+        f path
+    finally
+        File.Delete(path)
+
+[<Tests>]
+let fileEncoding =
+    testList "parseFile encoding (parity with java.util.Properties.load(InputStream))" [
+        testCase "Latin-1 bytes are read as Latin-1 characters" <| fun () ->
+            // "caf" followed by 0xE9 which is 'é' in ISO-8859-1
+            let bytes = Array.append (System.Text.Encoding.ASCII.GetBytes "key=caf") [| 0xE9uy |]
+            let parsed = withTempFile bytes JavaPropertiesFile.parseFile
+            let expected = [ KeyValue("key", "café") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "UTF-8 multi-byte sequences are read byte by byte, like Java does" <| fun () ->
+            // 'é' as UTF-8 is 0xC3 0xA9, which Java reads as the two Latin-1 chars "Ã©"
+            let bytes = Array.append (System.Text.Encoding.ASCII.GetBytes "key=caf") [| 0xC3uy; 0xA9uy |]
+            let parsed = withTempFile bytes JavaPropertiesFile.parseFile
+            let expected = [ KeyValue("key", "cafÃ©") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "A UTF-8 BOM is not detected and becomes part of the first key, like Java does" <| fun () ->
+            let bytes = Array.append [| 0xEFuy; 0xBBuy; 0xBFuy |] (System.Text.Encoding.ASCII.GetBytes "key=value")
+            let parsed = withTempFile bytes JavaPropertiesFile.parseFile
+            let expected = [ KeyValue("ï»¿key", "value") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "Unicode escapes still give characters outside of Latin-1" <| fun () ->
+            let bytes = System.Text.Encoding.ASCII.GetBytes "key=\\u00e9\\u4e2d"
+            let parsed = withTempFile bytes JavaPropertiesFile.parseFile
+            let expected = [ KeyValue("key", "é中") ]
+
+            Expect.equal "eq" expected parsed
+
+        testCase "The Readme UTF-8 recipe reads UTF-8 files correctly" <| fun () ->
+            let bytes = System.Text.Encoding.UTF8.GetBytes "key=café"
+            let parsed =
+                withTempFile bytes (fun path ->
+                    use reader = new System.IO.StreamReader(path, System.Text.Encoding.UTF8)
+                    JavaPropertiesFile.parseTextReader reader)
+            let expected = [ KeyValue("key", "café") ]
 
             Expect.equal "eq" expected parsed
     ]
