@@ -87,6 +87,43 @@ let tests =
                 Expect.equal "empty PATH entries are dropped" [| dir1; dir2 |] PathEnvironment.path
             )
 
+        testCase "findExecutable finds a name that already has an executable extension" <| fun () ->
+            let root = mkTmpDir ()
+            try
+                let onPath = Directory.CreateDirectory(Path.Combine(root.FullName, "on-path"))
+                let baseName = "marker_" + Guid.NewGuid().ToString("N")
+                let exePath = Path.Combine(onPath.FullName, baseName + ".exe")
+                File.WriteAllText(exePath, "")
+
+                withEnvVar "PATH" onPath.FullName (fun () ->
+                    withEnvVar "PATHEXT" ".COM;.EXE;.BAT" (fun () ->
+                        Expect.equal "with the extension (same case)" (Some exePath) (PathEnvironment.findExecutable (baseName + ".exe") false)
+                        if Environment.OSVersion.Platform = PlatformID.Win32NT then
+                            Expect.equal "with the extension (other case)" (Some exePath) (PathEnvironment.findExecutable (baseName + ".EXE") false)
+                            Expect.equal "without the extension" (Some exePath) (PathEnvironment.findExecutable baseName false)
+                    )
+                )
+            finally
+                Directory.Delete(root.FullName, true)
+
+        testCase "findExecutable doesn't consider a file with a non-executable extension (Windows only)" <| fun () ->
+            if Environment.OSVersion.Platform = PlatformID.Win32NT then
+                let root = mkTmpDir ()
+                try
+                    let onPath = Directory.CreateDirectory(Path.Combine(root.FullName, "on-path"))
+                    let baseName = "marker_" + Guid.NewGuid().ToString("N")
+                    File.WriteAllText(Path.Combine(onPath.FullName, baseName + ".txt"), "")
+                    File.WriteAllText(Path.Combine(onPath.FullName, baseName), "")
+
+                    withEnvVar "PATH" onPath.FullName (fun () ->
+                        withEnvVar "PATHEXT" ".COM;.EXE;.BAT" (fun () ->
+                            Expect.equal "other extension" None (PathEnvironment.findExecutable (baseName + ".txt") false)
+                            Expect.equal "no extension" None (PathEnvironment.findExecutable baseName false)
+                        )
+                    )
+                finally
+                    Directory.Delete(root.FullName, true)
+
         testCase "pathExt drops empty entries produced by a leading, trailing or doubled separator (Windows only)" <| fun () ->
             if Environment.OSVersion.Platform = PlatformID.Win32NT then
                 let sep = string Path.PathSeparator

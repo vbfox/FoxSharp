@@ -23,9 +23,18 @@ module private PathEnvironmentUtils =
         |> Seq.collect (fun dir -> names |> List.choose (tryCombine dir))
         |> Seq.tryFind(File.Exists)
 
-    let findProgramInDirs dirs programExts name =
+    let findProgramInDirs dirs programExts (name: string) =
         let namesWithExt = programExts |> List.map ((+) name)
-        let names = if noExtensionsExecutable then name :: namesWithExt else namesWithExt
+        // The name is also tried as-is when executables don't need an extension (Unix) or when it already ends
+        // with one of the executable extensions (`findExecutable "node.exe"` on windows), which is what `cmd.exe`
+        // and `CreateProcess` do. A name with another extension (`foo.txt`) isn't an executable and is only tried
+        // with the extensions appended.
+        let alreadyHasProgramExt =
+            programExts
+            |> List.exists (fun (ext: string) ->
+                ext <> "" && name.Length > ext.Length && name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+        let names =
+            if noExtensionsExecutable || alreadyHasProgramExt then name :: namesWithExt else namesWithExt
         findFileInDirs dirs names
 
     let envVarOrEmpty name =

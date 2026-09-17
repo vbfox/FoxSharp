@@ -14,6 +14,7 @@
     <Compile Include="MsvcrCommandLineTests.fs" />
     <Compile Include="MonoUnixCommandLineTests.fs" />
     <Compile Include="DotnetCoreUnixCommandLineTests.fs" />
+    <Compile Include="CommandLineSpecialCharsTests.fs" />
     <Compile Include="PathEnvironmentTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>

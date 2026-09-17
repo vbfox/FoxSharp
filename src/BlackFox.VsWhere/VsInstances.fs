@@ -126,16 +126,19 @@ let private parseInstance (instance: ISetupInstance) =
 
     match instance with
     | :? ISetupInstance2 as v2 ->
+        // `GetProduct`, `GetProductPath`, `GetErrors`, `GetProperties` and `GetEnginePath` are all documented as
+        // `_Outptr_result_maybenull_` in `Setup.Configuration.h`: an instance that failed to install or that is
+        // still being installed can have no product at all.
         { result with
             State = v2.GetState() |> Some
             Packages = v2.GetPackages() |> emptySeqIfNull |> Seq.map parsePackageReference |> List.ofSeq
-            Product = parsePackageReference (v2.GetProduct()) |> Some
-            ProductPath = v2.GetProductPath() |> Some
+            Product = v2.GetProduct() |> Option.ofObj |> Option.map parsePackageReference
+            ProductPath = v2.GetProductPath() |> Option.ofObj
             Errors = v2.GetErrors() |> Option.ofObj |> Option.map parseErrorState
             IsLaunchable = v2.IsLaunchable() |> Some
             IsComplete = v2.IsComplete() |> Some
             Properties = parseProperties (v2.GetProperties())
-            EnginePath = v2.GetEnginePath() |> Some }
+            EnginePath = v2.GetEnginePath() |> Option.ofObj }
     | _ -> result
 
 let private parseInstanceOrNone (instance: ISetupInstance) =

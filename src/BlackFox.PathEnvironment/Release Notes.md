@@ -5,6 +5,10 @@
 * `findExecutable`/`findFile` no longer throw when a name can't be combined into a path; such candidates are now skipped instead.
 * Document that `includeCurrentDirectory` searches the current directory before the PATH, and that names are
   used as relative paths so one containing a directory separator can escape the PATH directories.
+* Fix `findExecutable` on windows not finding a name that already has an executable extension
+  (`findExecutable "node.exe"` looked for `node.exe.COM`, `node.exe.EXE`, … but never for `node.exe`). The name is
+  now also tried as-is when it ends with one of the `PATHEXT` extensions, as `cmd.exe` does. A name with another
+  extension is still not considered executable.
 
 ### New in 0.3.0
 

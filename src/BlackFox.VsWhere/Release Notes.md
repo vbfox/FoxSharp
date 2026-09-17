@@ -3,6 +3,11 @@
 * Fix `ISetupInstance2` being declared with the IID of `ISetupInstance`. The runtime type test used to pick the
   `ISetupInstance2` branch for every instance, including the older ones that only implement `ISetupInstance`, and
   calling the extra methods on those went past the end of their vtable
+* Fix `ISetupFailedPackageReference2` being declared with the IID of `ISetupFailedPackageReference`, for the same
+  reason
+* An instance without a product (`GetProduct` returns null for an installation that failed or isn't finished) is no
+  longer dropped from `getAll` with a trace error, it is now returned with `Product = None`. `ProductPath` and
+  `EnginePath` are `None` instead of `Some null` when the COM API returns null
 
 ### New in 1.1.0
 
