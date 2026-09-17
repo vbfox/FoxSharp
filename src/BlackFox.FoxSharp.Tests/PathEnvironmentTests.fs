@@ -100,11 +100,12 @@ let tests =
             )
 
         testCase "pathExt drops empty entries produced by a leading, trailing or doubled separator (Windows only)" <| fun () ->
-            if Environment.OSVersion.Platform = PlatformID.Win32NT then
-                let sep = string Path.PathSeparator
-                let pathExtValue = sep + ".COM" + sep + sep + ".EXE" + sep
+            if not isWindows then skiptest "PATHEXT is only used on Windows"
 
-                withEnvVar "PATHEXT" pathExtValue (fun () ->
-                    Expect.equal "empty PATHEXT entries are dropped" [| ".COM"; ".EXE" |] PathEnvironment.pathExt
-                )
+            let sep = string Path.PathSeparator
+            let pathExtValue = sep + ".COM" + sep + sep + ".EXE" + sep
+
+            withEnvVar "PATHEXT" pathExtValue (fun () ->
+                Expect.equal "empty PATHEXT entries are dropped" [| ".COM"; ".EXE" |] PathEnvironment.pathExt
+            )
     ]
