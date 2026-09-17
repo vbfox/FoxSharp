@@ -5,86 +5,45 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpValueCache() =
-    let typeKey (t: Type) =
-        t.FullName
+    let propertyKey (p: PropertyInfo) = struct(p.DeclaringType, p.Name)
 
-    let propertyKey (p: PropertyInfo) =
-        struct(p.DeclaringType.FullName, p.Name)
+    let unionCaseKey (c: UnionCaseInfo) = struct(c.DeclaringType, c.Name)
 
-    let unionCaseKey (c: UnionCaseInfo) =
-        struct(c.DeclaringType.FullName, c.Name)
+    let recordFieldReader = DictCache.create propertyKey FSharpValue.PreComputeRecordFieldReader
 
-    let recordFieldReader =
-        DictCache.create
-            propertyKey
-            FSharpValue.PreComputeRecordFieldReader
+    let recordReader = DictCache.create id FSharpValue.PreComputeRecordReader
 
-    let recordReader =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeRecordReader
+    let recordConstructor = DictCache.create id FSharpValue.PreComputeRecordConstructor
 
-    let recordConstructor =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeRecordConstructor
+    let recordConstructorInfo = DictCache.create id FSharpValue.PreComputeRecordConstructorInfo
 
-    let recordConstructorInfo =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeRecordConstructorInfo
+    let unionTagReader = DictCache.create id FSharpValue.PreComputeUnionTagReader
 
-    let unionTagReader =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeUnionTagReader
+    let unionTagMemberInfo = DictCache.create id FSharpValue.PreComputeUnionTagMemberInfo
 
-    let unionTagMemberInfo =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeUnionTagMemberInfo
+    let unionConstructorInfo = DictCache.create unionCaseKey FSharpValue.PreComputeUnionConstructorInfo
 
-    let unionConstructorInfo =
-        DictCache.create
-            unionCaseKey
-            FSharpValue.PreComputeUnionConstructorInfo
+    let unionConstructor = DictCache.create unionCaseKey FSharpValue.PreComputeUnionConstructor
 
-    let unionConstructor =
-        DictCache.create
-            unionCaseKey
-            FSharpValue.PreComputeUnionConstructor
+    let unionReader = DictCache.create unionCaseKey FSharpValue.PreComputeUnionReader
 
-    let unionReader =
-        DictCache.create
-            unionCaseKey
-            FSharpValue.PreComputeUnionReader
-
-    let tupleReader =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeTupleReader
+    let tupleReader = DictCache.create id FSharpValue.PreComputeTupleReader
 
     let tuplePropertyInfo =
         DictCache.create
-            (fun struct(tupleType: Type, index: int) -> sprintf "%s.%i" tupleType.FullName index)
+            (fun struct(tupleType: Type, index: int) -> struct(tupleType, index))
             (fun struct(tupleType: Type, index: int) -> FSharpValue.PreComputeTuplePropertyInfo(tupleType, index))
 
-    let tupleConstructor =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeTupleConstructor
+    let tupleConstructor = DictCache.create id FSharpValue.PreComputeTupleConstructor
 
-    let tupleConstructorInfo =
-        DictCache.create
-            typeKey
-            FSharpValue.PreComputeTupleConstructorInfo
+    let tupleConstructorInfo = DictCache.create id FSharpValue.PreComputeTupleConstructorInfo
 
-    static member private lazyShared = lazy (FSharpValueCache())
+    static let lazyShared = lazy (FSharpValueCache())
 
-    static member Shared with get() = FSharpValueCache.lazyShared.Value
+    static member Shared with get() = lazyShared.Value
 
     /// <summary>Precompute a function for reading a particular field from a record.
-    /// Assumes the given type is a RecordType with a field of the given name. 
+    /// Assumes the given type is a RecordType with a field of the given name.
     /// If not, ArgumentException is raised during pre-computation.</summary>
     ///
     /// <remarks>Using the computed function will typically be faster than executing a corresponding call to Value.GetInfo
@@ -100,7 +59,7 @@ type FSharpValueCache() =
     /// same order as the fields reported by a call to Microsoft.FSharp.Reflection.Type.GetInfo for
     /// this type.</summary>
     ///
-    /// <remarks>Assumes the given type is a RecordType. 
+    /// <remarks>Assumes the given type is a RecordType.
     /// If not, ArgumentException is raised during pre-computation.
     ///
     /// Using the computed function will typically be faster than executing a corresponding call to Value.GetInfo
@@ -128,7 +87,7 @@ type FSharpValueCache() =
     member __.GetRecordConstructorInfo (recordType:Type) : ConstructorInfo =
         recordConstructorInfo |> DictCache.get recordType
 
-    /// <summary>Assumes the given type is a union type. 
+    /// <summary>Assumes the given type is a union type.
     /// If not, ArgumentException is raised during pre-computation.</summary>
     ///
     /// <remarks>Using the computed function is more efficient than calling GetUnionCase
@@ -174,14 +133,14 @@ type FSharpValueCache() =
     /// <returns>A function to read values of the given tuple type.</returns>
     member __.GetTupleReader(tupleType:Type): (obj -> obj[]) =
         tupleReader |> DictCache.get tupleType
-    
+
     /// <summary>Gets information that indicates how to read a field of a tuple</summary>
     /// <param name="tupleType">The input tuple type.</param>
     /// <param name="index">The index of the tuple element to describe.</param>
     /// <returns>The description of the tuple element and an optional type and index if the tuple is big.</returns>
     member __.GetTuplePropertyInfo(tupleType:Type, index:int): PropertyInfo * (Type * int) option =
         tuplePropertyInfo |> DictCache.get struct(tupleType, index)
-    
+
     /// <summary>Precompute a function for reading the values of a particular tuple type</summary>
     ///
     /// <remarks>Assumes the given type is a TupleType.
@@ -192,14 +151,14 @@ type FSharpValueCache() =
     member __.GetTupleConstructor(tupleType:Type): (obj[] -> obj) =
         tupleConstructor |> DictCache.get tupleType
 
-    /// <summary>Gets a method that constructs objects of the given tuple type. 
+    /// <summary>Gets a method that constructs objects of the given tuple type.
     /// For small tuples, no additional type will be returned.</summary>
-    /// 
+    ///
     /// <remarks>For large tuples, an additional type is returned indicating that
     /// a nested encoding has been used for the tuple type. In this case
     /// the suffix portion of the tuple type has the given type and an
-    /// object of this type must be created and passed as the last argument 
-    /// to the ConstructorInfo. A recursive call to PreComputeTupleConstructorInfo 
+    /// object of this type must be created and passed as the last argument
+    /// to the ConstructorInfo. A recursive call to PreComputeTupleConstructorInfo
     /// can be used to determine the constructor for that the suffix type.</remarks>
     /// <param name="tupleType">The input tuple type.</param>
     /// <returns>The description of the tuple type constructor and an optional extra type

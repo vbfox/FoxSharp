@@ -14,9 +14,11 @@
     <Compile Include="MonoUnixCommandLineTests.fs" />
     <Compile Include="DotnetCoreUnixCommandLineTests.fs" />
     <Compile Include="PathEnvironmentTests.fs" />
+    <Compile Include="CachedFSharpReflectionTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BlackFox.CachedFSharpReflection\BlackFox.CachedFSharpReflection.fsproj" />
     <ProjectReference Include="..\BlackFox.CommandLine\BlackFox.CommandLine.fsproj" />
     <ProjectReference Include="..\BlackFox.CommandLine.TestParsers\BlackFox.CommandLine.TestParsers.csproj" />
     <ProjectReference Include="..\BlackFox.JavaPropertiesFile\BlackFox.JavaPropertiesFile.fsproj" />

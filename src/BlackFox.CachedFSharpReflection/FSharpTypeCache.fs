@@ -5,67 +5,31 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 
 type FSharpTypeCache() =
-    let typeKey (t: Type) =
-        t.FullName
-        
-    let isFunction =
-        DictCache.create
-            typeKey
-            FSharpType.IsFunction
+    let isFunction = DictCache.create id FSharpType.IsFunction
 
-    let isModule =
-        DictCache.create
-            typeKey
-            FSharpType.IsModule
+    let isModule = DictCache.create id FSharpType.IsModule
 
-    let isTuple =
-        DictCache.create
-            typeKey
-            FSharpType.IsTuple
+    let isTuple = DictCache.create id FSharpType.IsTuple
 
-    let isRecord =
-        DictCache.create
-            typeKey
-            FSharpType.IsRecord
+    let isRecord = DictCache.create id FSharpType.IsRecord
 
-    let isUnion =
-        DictCache.create
-            typeKey
-            FSharpType.IsUnion
+    let isUnion = DictCache.create id FSharpType.IsUnion
 
-    let isExceptionRepresentation =
-        DictCache.create
-            typeKey
-            FSharpType.IsExceptionRepresentation
+    let isExceptionRepresentation = DictCache.create id FSharpType.IsExceptionRepresentation
 
-    let getTupleElements =
-        DictCache.create
-            typeKey
-            FSharpType.GetTupleElements
+    let getTupleElements = DictCache.create id FSharpType.GetTupleElements
 
-    let getFunctionElements =
-        DictCache.create
-            typeKey
-            FSharpType.GetFunctionElements
+    let getFunctionElements = DictCache.create id FSharpType.GetFunctionElements
 
-    let getRecordFields =
-        DictCache.create
-            typeKey
-            FSharpType.GetRecordFields
+    let getRecordFields = DictCache.create id FSharpType.GetRecordFields
 
-    let getUnionCases =
-        DictCache.create
-            typeKey
-            FSharpType.GetUnionCases
+    let getUnionCases = DictCache.create id FSharpType.GetUnionCases
 
-    let getExceptionFields =
-        DictCache.create
-            typeKey
-            FSharpType.GetExceptionFields
+    let getExceptionFields = DictCache.create id FSharpType.GetExceptionFields
 
-    static member private lazyShared = lazy (FSharpTypeCache())
+    static let lazyShared = lazy (FSharpTypeCache())
 
-    static member Shared with get() = FSharpTypeCache.lazyShared.Value
+    static member Shared with get() = lazyShared.Value
 
     /// <summary>Return true if the <c>typ</c> is a representation of an F# function type or the runtime type of a closure implementing an F# function type</summary>
     /// <param name="typ">The type to check.</param>
