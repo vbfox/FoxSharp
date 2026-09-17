@@ -24,6 +24,8 @@ let private withCurrentDirectory (dir: string) (f: unit -> unit) =
     finally
         Environment.CurrentDirectory <- previous
 
+let private isWindows = Environment.OSVersion.Platform = PlatformID.Win32NT
+
 let mkTmpDir () =
     Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "BlackFox.PathEnvironment.Tests_" + Guid.NewGuid().ToString("N")))
 
@@ -72,9 +74,19 @@ let tests =
                 Expect.equal "" [||] PathEnvironment.path
             )
 
-        testCase "pathExt doesn't throw when PATHEXT is unset" <| fun () ->
+        testCase "pathExt falls back to the cmd.exe built-in list when PATHEXT is unset (Windows only)" <| fun () ->
+            if not isWindows then skiptest "PATHEXT is only used on Windows"
+
             withEnvVar "PATHEXT" null (fun () ->
-                PathEnvironment.pathExt |> ignore
+                let cmdBuiltInList = [| ".COM"; ".EXE"; ".BAT"; ".CMD"; ".VBS"; ".JS"; ".WS"; ".MSC" |]
+                Expect.equal "the cmd.exe built-in list is used when PATHEXT is unset" cmdBuiltInList PathEnvironment.pathExt
+            )
+
+        testCase "pathExt is a single empty extension when PATHEXT is unset (non-Windows only)" <| fun () ->
+            if isWindows then skiptest "PATHEXT is used on Windows"
+
+            withEnvVar "PATHEXT" null (fun () ->
+                Expect.equal "non-Windows systems don't use PATHEXT" [| "" |] PathEnvironment.pathExt
             )
 
         testCase "path drops empty entries produced by a leading, trailing or doubled separator" <| fun () ->

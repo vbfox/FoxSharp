@@ -4,14 +4,8 @@ open System
 open System.IO
 
 module private PathEnvironmentUtils =
-    let private noExtensionsExecutable =
-        match Environment.OSVersion.Platform with
-        | PlatformID.Win32NT
-        | PlatformID.Win32S
-        | PlatformID.Win32Windows
-        | PlatformID.WinCE
-        | PlatformID.Xbox -> false
-        | _ -> true
+    let private isWindows = Environment.OSVersion.Platform = PlatformID.Win32NT
+    let private noExtensionsExecutable = not isWindows
 
     let private tryCombine (dir: string) (name: string) =
         try
@@ -28,22 +22,30 @@ module private PathEnvironmentUtils =
         let names = if noExtensionsExecutable then name :: namesWithExt else namesWithExt
         findFileInDirs dirs names
 
-    let envVarOrEmpty name =
-        let value = Environment.GetEnvironmentVariable(name)
+    let private envVarOrEmpty name =
+        let value = Environment.GetEnvironmentVariable name
         if isNull value then "" else value
 
     let private splitPathList (value: string) =
-        value.Split(Path.PathSeparator)
+        value.Split Path.PathSeparator
         |> Array.filter (String.IsNullOrEmpty >> not)
 
     let getPath () =
         splitPathList (envVarOrEmpty "PATH")
 
-    let getPathExt () =
-        if Environment.OSVersion.Platform = PlatformID.Win32NT then
-            splitPathList (envVarOrEmpty "PATHEXT")
+    /// The fallback list embedded inside cmd.exe and used when PATHEXT is absent or empty.
+    ///
+    /// This value was extracted from the cmd.exe of a a Windows 11 Version 25H2 (OS Build 26200.9457)
+    let private windowsFallbackPathExt = ".COM;.EXE;.BAT;.CMD;.VBS;.JS;.WS;.MSC"
+
+    let getPathExt =
+        if isWindows then
+            fun () ->
+                let rawEnvVar = envVarOrEmpty "PATHEXT"
+                let rawPathExt = if rawEnvVar.Length = 0 then windowsFallbackPathExt else rawEnvVar
+                splitPathList rawPathExt
         else
-            [|""|]
+            fun () -> [|""|]
 
     let addCwd (includeCurrentDirectory: bool) (arr: string []) =
         if includeCurrentDirectory then
